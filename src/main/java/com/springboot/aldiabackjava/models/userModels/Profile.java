@@ -1,4 +1,4 @@
-package com.springboot.aldiabackjava.models;
+package com.springboot.aldiabackjava.models.userModels;
 
 import jakarta.persistence.*;
 

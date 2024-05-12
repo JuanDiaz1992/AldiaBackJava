@@ -1,13 +1,13 @@
 package com.springboot.aldiabackjava.controller;
 
 
-import com.springboot.aldiabackjava.models.User;
+import com.springboot.aldiabackjava.models.userModels.User;
 import com.springboot.aldiabackjava.services.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class UserController {
@@ -16,6 +16,14 @@ public class UserController {
 
     @GetMapping("/users")
     public List<User> getAllUsers(){
-        return userServices.getUser();
+        return userServices.getAllUsers();
+    }
+    @GetMapping("/public/users/{username}")
+    public User getUserForUserName(@PathVariable String username){
+        return  userServices.getUser(username);
+    }
+    @PostMapping("/public/users/login")
+    public String loginUser(@RequestBody Map<String, String> dataLogin){
+        return userServices.login(dataLogin);
     }
 }

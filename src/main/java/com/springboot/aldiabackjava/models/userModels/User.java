@@ -1,12 +1,7 @@
-package com.springboot.aldiabackjava.models;
+package com.springboot.aldiabackjava.models.userModels;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.springboot.aldiabackjava.repositories.IUserRepository;
 import jakarta.persistence.*;
-import org.springframework.beans.factory.annotation.Autowired;
-
-
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -18,23 +13,24 @@ public class User {
     private String username;
     @JsonIgnore
     private String password;
-    private int type_user;
+    @Column(name="type_user")
+    private int typeUser;
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_profile", referencedColumnName = "id_profile")
     private Profile profile;
 
-    public User(int idUser, String username, String password, int type_user, Profile profile) {
+    public User(int idUser, String username, String password, int typeUser, Profile profile) {
         this.idUser = idUser;
         this.username = username;
         this.password = password;
-        this.type_user = type_user;
+        this.typeUser = typeUser;
         this.profile = profile;
     }
 
-    public User(String username, String password, int type_user, Profile profile) {
+    public User(String username, String password, int typeUser, Profile profile) {
         this.username = username;
         this.password = password;
-        this.type_user = type_user;
+        this.typeUser = typeUser;
         this.profile = profile;
     }
 
@@ -65,12 +61,12 @@ public class User {
         this.password = password;
     }
 
-    public int getType_user() {
-        return type_user;
+    public int getTypeUser() {
+        return typeUser;
     }
 
-    public void setType_user(int type_user) {
-        this.type_user = type_user;
+    public void setTypeUser(int type_user) {
+        this.typeUser = typeUser;
     }
 
     public Profile getProfile() {

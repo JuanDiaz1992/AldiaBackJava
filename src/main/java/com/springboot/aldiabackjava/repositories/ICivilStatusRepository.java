@@ -1,6 +1,6 @@
 package com.springboot.aldiabackjava.repositories;
 
-import com.springboot.aldiabackjava.models.CivilStatus;
+import com.springboot.aldiabackjava.models.userModels.CivilStatus;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
