@@ -1,4 +1,4 @@
-package com.springboot.aldiabackjava.services;
+package com.springboot.aldiabackjava.JWT;
 
 import com.springboot.aldiabackjava.models.userModels.User;
 import io.jsonwebtoken.*;
@@ -13,21 +13,21 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class TokenService {
+public class JwtTokenService {
     private final String secretKey = "miClaveSecretaSuperSegura1234567890";
 
     public String generateToken(User userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userDetails.getIdUser());
         claims.put("username", userDetails.getUsername());
-        claims.put("typeUser", userDetails.getTypeUser());
+        claims.put("typeUser", userDetails.getRole());
 
         JwtBuilder jwtBuilder = Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(Instant.now().plusSeconds(3600)))
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, secretKey);
+                .signWith(SignatureAlgorithm.HS256, secretKey);
 
         return jwtBuilder.compact();
     }

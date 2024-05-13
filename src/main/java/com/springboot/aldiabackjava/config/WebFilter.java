@@ -1,8 +1,11 @@
 package com.springboot.aldiabackjava.config;
 
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+
 
 @Configuration
 public class WebFilter implements WebMvcConfigurer {
@@ -13,6 +16,5 @@ public class WebFilter implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // Métodos HTTP permitidos
                 .allowedHeaders("*"); // Encabezados permitidos
     }
-
 
 }
