@@ -18,11 +18,11 @@ public class UserController {
     public List<User> getAllUsers(){
         return userServices.getAllUsers();
     }
-    @GetMapping("/public/users/{username}")
+    @GetMapping("/users/{username}")
     public User getUserForUserName(@PathVariable String username){
         return  userServices.getUser(username);
     }
-    @PostMapping("/public/users/login")
+    @PostMapping("/users/login")
     public String loginUser(@RequestBody Map<String, String> dataLogin){
         return userServices.login(dataLogin);
     }

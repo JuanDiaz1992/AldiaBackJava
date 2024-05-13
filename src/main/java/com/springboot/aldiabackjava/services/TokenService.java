@@ -3,6 +3,7 @@ package com.springboot.aldiabackjava.services;
 import com.springboot.aldiabackjava.models.userModels.User;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 
 import java.time.Instant;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
+@Service
 public class TokenService {
     private final String secretKey = "miClaveSecretaSuperSegura1234567890";
 
@@ -25,7 +27,7 @@ public class TokenService {
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(Instant.now().plusSeconds(3600)))
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS256, secretKey);
+                .signWith(SignatureAlgorithm.HS512, secretKey);
 
         return jwtBuilder.compact();
     }

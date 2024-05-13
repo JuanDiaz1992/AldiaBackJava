@@ -14,11 +14,10 @@ import java.util.Map;
 
 @Service
 public class UserServices {
-    private static final Logger log = LoggerFactory.getLogger(UserServices.class);
     @Autowired
     private IUserRepository iUserRepository;
-
-
+    @Autowired
+    private TokenService tokenService;
 
 
     public List<User> getAllUsers(){
@@ -40,7 +39,7 @@ public class UserServices {
         if (user!=null){
             Boolean isCorrect = EncryptPassword.validatePassword(dataLogin.get("password"),user.getPassword());
             if (isCorrect){
-                return user.getUsername();
+                return tokenService.generateToken(user);
             }
         }{
             return null;
