@@ -2,55 +2,75 @@ package com.springboot.aldiabackjava.JWT;
 
 import com.springboot.aldiabackjava.models.userModels.User;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 
+import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Slf4j
 @Service
 public class JwtTokenService {
-    private final String secretKey = "miClaveSecretaSuperSegura1234567890";
+    private static final String SECRET_KEY="586E3272357538782F413F4428472B4B6250655368566B597033733676397924";
 
-    public String generateToken(User userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userDetails.getIdUser());
-        claims.put("username", userDetails.getUsername());
-        claims.put("typeUser", userDetails.getRole());
-
-        JwtBuilder jwtBuilder = Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plusSeconds(3600)))
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS256, secretKey);
-
-        return jwtBuilder.compact();
+    public String getToken(UserDetails user) {
+        return getToken(new HashMap<>(), user);
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token);
-            return true;
-        } catch (SignatureException e) {
-            log.error("Firma del token JWT inválida: {}", e.getMessage());
-        } catch (MalformedJwtException e) {
-            log.error("Formato del token JWT inválido: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            log.error("Token JWT expirado: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.error("Token JWT no compatible: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("Error al validar token JWT: {}", e.getMessage());
-        }
-
-        return false;
+    private String getToken(Map<String,Object> extraClaims, UserDetails user) {
+        return Jwts
+                .builder()
+                .setClaims(extraClaims)
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis()+1000*60*24))
+                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
+
+    private Key getKey() {
+        byte[] keyBytes= Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private Claims getAllClaims(String token){
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(getKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public <T> T getClaim(String token, Function<Claims,T> claimsResolver){
+        final Claims claims=getAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    public String getUsernameFromToken(String token) {
+        return getClaim(token, Claims::getSubject);
+    }
+
+    private Date getExpiration(String token){
+        return getClaim(token, Claims::getExpiration);
+    }
+
+    private boolean isTokenExpired(String token){
+        return getExpiration(token).before(new Date());
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username=getUsernameFromToken(token);
+        return (username.equals(userDetails.getUsername())&& !isTokenExpired(token));
+    }
+
 
 }

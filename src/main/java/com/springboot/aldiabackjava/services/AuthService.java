@@ -1,27 +1,31 @@
 package com.springboot.aldiabackjava.services;
 
 import com.springboot.aldiabackjava.JWT.JwtTokenService;
-import com.springboot.aldiabackjava.controller.userControllers.AuthResponse;
-import com.springboot.aldiabackjava.controller.userControllers.LoginRequest;
-import com.springboot.aldiabackjava.controller.userControllers.RegisterRequest;
+import com.springboot.aldiabackjava.services.requestAndResponse.AuthResponse;
+import com.springboot.aldiabackjava.services.requestAndResponse.LoginRequest;
+import com.springboot.aldiabackjava.services.requestAndResponse.RegisterRequest;
 import com.springboot.aldiabackjava.models.userModels.Profile;
 import com.springboot.aldiabackjava.models.userModels.User;
 import com.springboot.aldiabackjava.repositories.IProfileRepository;
 import com.springboot.aldiabackjava.repositories.IUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-    @Autowired
-    private IUserRepository iUserRepository;
-    @Autowired
-    private IProfileRepository iProfileRepository;
-    @Autowired
-    private JwtTokenService jwtTokenService;
+    private final IUserRepository iUserRepository;
+    private final IProfileRepository iProfileRepository;
+    private final JwtTokenService jwtTokenService;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
 
     public List<User> getAllUsers(){
@@ -38,7 +42,10 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        return null;
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
+        UserDetails user = iUserRepository.findByUsername(request.getUsername()).orElseThrow();
+        String token = jwtTokenService.getToken(user);
+        return AuthResponse.builder().token(token).build();
 
     }
 
@@ -63,10 +70,10 @@ public class AuthService {
         profile = iProfileRepository.save(profile);
         User user = User.builder()
                 .username(request.getUsername())
-                .password(request.getPassword())
+                .password(passwordEncoder.encode( request.getPassword()))
                 .role(request.getRole())
                 .profile(profile).build();
         iUserRepository.save(user);
-        return AuthResponse.builder().token(jwtTokenService.generateToken(user)).build();
+        return AuthResponse.builder().token(jwtTokenService.getToken(user)).build();
     }
 }

@@ -1,6 +1,9 @@
 package com.springboot.aldiabackjava.controller.userControllers;
 
 
+import com.springboot.aldiabackjava.services.requestAndResponse.AuthResponse;
+import com.springboot.aldiabackjava.services.requestAndResponse.LoginRequest;
+import com.springboot.aldiabackjava.services.requestAndResponse.RegisterRequest;
 import com.springboot.aldiabackjava.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

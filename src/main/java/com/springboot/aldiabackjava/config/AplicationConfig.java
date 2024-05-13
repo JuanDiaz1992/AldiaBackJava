@@ -21,14 +21,13 @@ public class AplicationConfig {
     private IUserRepository iUserRepository;
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception
-    {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider()
-    {   DaoAuthenticationProvider authenticationProvider= new DaoAuthenticationProvider();
+    public AuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider authenticationProvider= new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
