@@ -7,14 +7,14 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.GrantedAuthority;
 
 
 import java.security.Key;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,6 +26,12 @@ public class JwtTokenService {
     }
 
     private String getToken(Map<String,Object> extraClaims, UserDetails user) {
+        List<String> userRoles = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        userRoles.forEach(rol ->{
+            extraClaims.put("rol", rol);
+        });
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
@@ -72,5 +78,15 @@ public class JwtTokenService {
         return (username.equals(userDetails.getUsername())&& !isTokenExpired(token));
     }
 
+
+    public String getRoleFromToken(String token) {
+        return getClaim(token, claims -> {
+            String role = (String) claims.get("rol");
+            if (role != null) {
+                return role;
+            }
+            return null;
+        });
+    }
 
 }

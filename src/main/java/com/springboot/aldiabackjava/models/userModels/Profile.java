@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 @Entity
-@Table(name="profiles")
+@Table(name="profiles", uniqueConstraints = {@UniqueConstraint(columnNames = {"document"})})
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

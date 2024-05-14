@@ -1,6 +1,7 @@
 package com.springboot.aldiabackjava.services;
 
 import com.springboot.aldiabackjava.JWT.JwtTokenService;
+import com.springboot.aldiabackjava.models.userModels.Role;
 import com.springboot.aldiabackjava.services.requestAndResponse.AuthResponse;
 import com.springboot.aldiabackjava.services.requestAndResponse.LoginRequest;
 import com.springboot.aldiabackjava.services.requestAndResponse.RegisterRequest;
@@ -56,6 +57,7 @@ public class AuthService {
                 .lastName(request.getLastName())
                 .surnamen(request.getSurnamen())
                 .typeDocument(request.getTypeDocument())
+                .document(request.getDocument())
                 .profilePicture(request.getProfilePicture())
                 .birthDate(request.getBirthDate())
                 .department(request.getDepartment())
@@ -71,7 +73,7 @@ public class AuthService {
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode( request.getPassword()))
-                .role(request.getRole())
+                .role(Role.USER)
                 .profile(profile).build();
         iUserRepository.save(user);
         return AuthResponse.builder().token(jwtTokenService.getToken(user)).build();
