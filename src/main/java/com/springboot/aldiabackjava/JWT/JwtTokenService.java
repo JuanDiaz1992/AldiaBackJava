@@ -79,14 +79,5 @@ public class JwtTokenService {
     }
 
 
-    public String getRoleFromToken(String token) {
-        return getClaim(token, claims -> {
-            String role = (String) claims.get("rol");
-            if (role != null) {
-                return role;
-            }
-            return null;
-        });
-    }
 
 }

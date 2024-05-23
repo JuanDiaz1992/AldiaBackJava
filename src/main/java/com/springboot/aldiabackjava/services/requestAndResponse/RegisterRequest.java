@@ -1,6 +1,6 @@
 package com.springboot.aldiabackjava.services.requestAndResponse;
 import com.springboot.aldiabackjava.models.userModels.CivilStatus;
-import com.springboot.aldiabackjava.models.userModels.Role;
+import com.springboot.aldiabackjava.models.userModels.Rol;
 import com.springboot.aldiabackjava.models.userModels.TypeDocument;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,7 @@ public class RegisterRequest {
     private int idUser;
     private String username;
     private String password;
-    private Role role;
+    private Rol rol;
     private int idPRofile;
     private String firstName;
     private String middleName;

@@ -1,6 +1,6 @@
 package com.springboot.aldiabackjava.JWT;
 
-import com.springboot.aldiabackjava.models.userModels.Role;
+import com.springboot.aldiabackjava.models.userModels.Rol;
 import com.springboot.aldiabackjava.models.userModels.User;
 import com.springboot.aldiabackjava.repositories.IUserRepository;
 import jakarta.servlet.FilterChain;
@@ -31,7 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final IUserRepository iUserRepository;
 
-
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String token = getTokenFromRequest(request);
@@ -56,14 +55,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    public Boolean isUserAdmin(HttpServletRequest request) throws ServletException, IOException {
-        User user = getUserFromtoken(request);
-        if (user.getRole().equals(Role.ADMIN)){
-            return true;
-        }{
-            return false;
-        }
-    }
 
     private String getTokenFromRequest(HttpServletRequest request){
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
