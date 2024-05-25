@@ -3,6 +3,7 @@ package com.springboot.aldiabackjava.config;
 import com.springboot.aldiabackjava.models.userModels.User;
 import com.springboot.aldiabackjava.repositories.IUserRepository;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import java.util.Collections;
 
 
 @Configuration
+@AllArgsConstructor
 public class AplicationConfig {
     @Autowired
     private IUserRepository iUserRepository;

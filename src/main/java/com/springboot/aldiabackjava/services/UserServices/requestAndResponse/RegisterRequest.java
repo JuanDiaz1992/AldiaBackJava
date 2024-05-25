@@ -1,4 +1,4 @@
-package com.springboot.aldiabackjava.services.requestAndResponse;
+package com.springboot.aldiabackjava.services.UserServices.requestAndResponse;
 import com.springboot.aldiabackjava.models.userModels.CivilStatus;
 import com.springboot.aldiabackjava.models.userModels.Rol;
 import com.springboot.aldiabackjava.models.userModels.TypeDocument;
