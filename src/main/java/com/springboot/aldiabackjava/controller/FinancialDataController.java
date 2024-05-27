@@ -17,9 +17,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users/financial")
 @AllArgsConstructor
-public class FinancialData {
+public class FinancialDataController {
     @Autowired
     private final FinancialServices financialServices;
+
+    //Incomes
 
     @GetMapping("/incomes/month/{month}")
     public ResponseEntity<Page<Income>> getIncomesForMounth(@PathVariable("month") String date, Pageable pageable){
@@ -35,6 +37,13 @@ public class FinancialData {
         return financialServices.insertIncomesService(income);
     }
 
+    @DeleteMapping("/incomes/delete/{id}")
+    public ResponseEntity<String> deleteIncome(@PathVariable("id") int id){
+        return financialServices.deleteIncomeService(id);
+    }
+
+
+    //Expenses
     @GetMapping("/expenses/month/{month}")
     public ResponseEntity<Page<Expense>> getExpensesForMounth(@PathVariable("month") String date, Pageable pageable){
         return financialServices.getExpensesForMounthService(date, pageable);
@@ -48,5 +57,10 @@ public class FinancialData {
     @PostMapping("/expenses")
     public ResponseEntity<String> insertExpenses(@RequestBody IncomeOrExpense expense){
         return financialServices.insertExpensesService(expense);
+    }
+
+    @DeleteMapping("/expenses/delete/{id}")
+    public ResponseEntity<String> deleteExpense(@PathVariable("id") int id){
+        return financialServices.deleteExpenseService(id);
     }
 }

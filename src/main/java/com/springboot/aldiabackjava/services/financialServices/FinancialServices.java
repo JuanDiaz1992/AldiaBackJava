@@ -29,6 +29,8 @@ public class FinancialServices {
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
+    //Incomes Services
+
     public ResponseEntity<Page<Income>> getIncomesForMounthService(String date, Pageable pageable) {
         User user = jwtInterceptor.getCurrentUser();
         Page<Income> incomesPage = iIncomeRepository.findByUserIdAndYearMonth(user.getIdUser(), date, pageable);
@@ -60,12 +62,26 @@ public class FinancialServices {
                     .category(incomeOrExpense.getCategory())
                     .user(user)
                     .build();
-            iIncomeRepository.save(income);
-            return ResponseEntity.ok().body("Registro guardado");
+            int id = iIncomeRepository.save(income).getIdIncome();
+            return ResponseEntity.ok().body("Registro guardado, id: "+id);
         }catch (Exception e){
             return ResponseEntity.ok().body("Ah ocurrido un error al guardar el registro");
         }
     }
+
+    public ResponseEntity<String> deleteIncomeService(int incomeId){
+        User user = jwtInterceptor.getCurrentUser();
+        Income income = iIncomeRepository.findById(incomeId).orElse(null);
+        if (income != null && income.getUser().equals(user)){
+            iIncomeRepository.delete(income);
+            return ResponseEntity.ok().body("Registro eliminado correctamente");
+        }else {
+            return ResponseEntity.badRequest().body("Ah ocurrido un error al eliminar el registro");
+        }
+    }
+
+
+    //Expenses Services
 
     public ResponseEntity<String> insertExpensesService(IncomeOrExpense incomeOrExpense) {
         try {
@@ -78,8 +94,8 @@ public class FinancialServices {
                     .category(incomeOrExpense.getCategory())
                     .user(user)
                     .build();
-            iExpenseRespository.save(income);
-            return ResponseEntity.ok().body("Registro guardado");
+            int id = iExpenseRespository.save(income).getId();
+            return ResponseEntity.ok().body("Registro guardado, id: "+id);
         }catch (Exception e){
             return ResponseEntity.ok().body("Ah ocurrido un error al guardar el registro");
         }
@@ -101,5 +117,16 @@ public class FinancialServices {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenses);
         }
         return ResponseEntity.ok().body(expenses);
+    }
+
+    public ResponseEntity<String> deleteExpenseService(int idExpense){
+        User user = jwtInterceptor.getCurrentUser();
+        Expense expense = iExpenseRespository.findById(idExpense).orElse(null);
+        if (expense != null && expense.getUser().equals(user)){
+            iExpenseRespository.delete(expense);
+            return ResponseEntity.ok().body("Registro eliminado correctamente");
+        }else {
+            return ResponseEntity.badRequest().body("Ah ocurrido un error al eliminar el registro");
+        }
     }
 }
