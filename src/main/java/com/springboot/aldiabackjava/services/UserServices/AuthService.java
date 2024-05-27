@@ -4,7 +4,7 @@ package com.springboot.aldiabackjava.services.UserServices;
 import com.springboot.aldiabackjava.JWT.JwtTokenService;
 import com.springboot.aldiabackjava.config.JwtInterceptor;
 import com.springboot.aldiabackjava.models.userModels.Rol;
-import com.springboot.aldiabackjava.services.DataValidate;
+import com.springboot.aldiabackjava.utils.DataValidate;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.LoginRequest;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
 import com.springboot.aldiabackjava.models.userModels.Profile;
@@ -34,7 +34,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
-
+import java.util.Base64;
+import java.util.UUID;
 
 
 @Slf4j
@@ -86,7 +87,7 @@ public class AuthService {
                 .surnamen(request.getSurnamen())
                 .typeDocument(request.getTypeDocument())
                 .document(request.getDocument())
-                .profilePicture(request.getProfilePicture())
+                .profilePicture("src/main/resources/static/img/sin_imagen.webp")
                 .birthDate(request.getBirthDate())
                 .department(request.getDepartment())
                 .town(request.getTown())
@@ -151,15 +152,25 @@ public class AuthService {
 
     }
 
-    public ResponseEntity<String> changerPictureProfilService(MultipartFile photo) {
+    public ResponseEntity<String> changerPictureProfilService(String photo) {
         try {
+            byte[] decodedBytes = Base64.getDecoder().decode(photo);
             User user = jwtInterceptor.getCurrentUser();
             String directory = "src/main/resources/static/img/users/" + user.getUsername() + "/";
             Path path = Paths.get(directory);
-            Files.createDirectories(path);
-            Files.copy(photo.getInputStream(), path.resolve("profile.webp"));
+            Files.createDirectories(path); // crea el directorio si este no existe.
+            String filename = "profile.webp";
+            Path imagePath = path.resolve(filename);
+            String currentProfilePicturePath = user.getProfile().getProfilePicture();
+            if (currentProfilePicturePath != "/img/sin_imagen.webp") {
+                Path currentProfilePicture = Paths.get("src/main/resources/static"+currentProfilePicturePath);
+                if (Files.exists(currentProfilePicture)) {
+                    Files.delete(currentProfilePicture);
+                }
+            }
+            Files.write(imagePath, decodedBytes);
             Profile profile = user.getProfile();
-            profile.setProfilePicture(directory+"profile.webp");
+            profile.setProfilePicture("/img/users/" + user.getUsername() +"/"+ filename);
             iProfileRepository.save(profile);
             return ResponseEntity.ok().body("Cambio exitoso");
         }catch (IOException e){
@@ -170,7 +181,7 @@ public class AuthService {
 
     public ResponseEntity<byte[]> getUserProfilePictureService() {
         User user = jwtInterceptor.getCurrentUser();
-        Path path = Paths.get(user.getProfile().getProfilePicture());
+        Path path = Paths.get("src/main/resources/static"+user.getProfile().getProfilePicture());
         try {
             Resource resource = new UrlResource(path.toUri());
             byte[] imageContent = IOUtils.toByteArray(resource.getInputStream());
@@ -182,6 +193,22 @@ public class AuthService {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public ResponseEntity<String> deleteProfilePictureService() {
+        User user = jwtInterceptor.getCurrentUser();
+        if (user.getProfile().getProfilePicture().equals("/img/sin_imagen.webp")){
+            return ResponseEntity.ok().body("No se puede relizar esta acción");
+        }
+        try {
+            Files.delete(Path.of("src/main/resources/static"+user.getProfile().getProfilePicture()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        user.getProfile().setProfilePicture("/img/sin_imagen.webp");
+        iProfileRepository.save(user.getProfile());
+        return ResponseEntity.ok().body("Foto eliminada");
+
     }
 
 }

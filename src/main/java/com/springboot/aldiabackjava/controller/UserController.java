@@ -6,14 +6,16 @@ import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.Cha
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
 
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/users/profile")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -21,7 +23,7 @@ public class UserController {
     private AuthService authService;
 
 
-    @GetMapping("/profile")
+    @GetMapping("")
     public ResponseEntity<User> getUser() {
         User user = authService.getUserService();
         return ResponseEntity.ok(user);
@@ -39,13 +41,19 @@ public class UserController {
     }
 
     @PutMapping("/edit/picture")
-    public ResponseEntity<String> changeProfilePicture(@RequestParam("file") MultipartFile file){
-        return authService.changerPictureProfilService(file);
+    public ResponseEntity<String> changeProfilePicture(@RequestBody Map<String, String> picture){
+        String photoBase64  = picture.get("photo");
+        return authService.changerPictureProfilService(photoBase64);
     }
 
-    @GetMapping("/profile/picture")
+    @GetMapping("/picture")
     public ResponseEntity<byte[]> getProfilePicture(){
         return authService.getUserProfilePictureService();
+    }
+
+    @DeleteMapping("/delete/picture")
+    public ResponseEntity<String> deleteProfilePicture(){
+        return authService.deleteProfilePictureService();
     }
 
 }

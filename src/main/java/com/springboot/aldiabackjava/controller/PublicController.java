@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/public")
@@ -27,8 +28,8 @@ public class PublicController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
     }
 
-    @PostMapping(value = "register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request){
+    @PostMapping(value = "register", consumes = {"multipart/form-data"})
+    public ResponseEntity<String> register(@RequestPart("request") RegisterRequest request){
         return authService.registerUserService(request);
     }
 }
