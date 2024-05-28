@@ -65,12 +65,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     }
 
-    public User getUserFromtoken(HttpServletRequest request) throws ServletException, IOException {
-        final String token = getTokenFromRequest(request);
-        final String username;
-        username=jwtService.getUsernameFromToken(token);
-        Optional<User>userOptional = iUserRepository.findByUsername(username);
-        return userOptional.get();
-    }
 
 }

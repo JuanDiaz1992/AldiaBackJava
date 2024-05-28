@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users/financial")
@@ -62,5 +63,11 @@ public class FinancialDataController {
     @DeleteMapping("/expenses/delete/{id}")
     public ResponseEntity<String> deleteExpense(@PathVariable("id") int id){
         return financialServices.deleteExpenseService(id);
+    }
+
+    //Expenses and Incomes together
+    @GetMapping("/allAmount/month/{month}")
+    public ResponseEntity<Map<String,Integer>> getExpensesAndIncomesAmountForMounth(@PathVariable("month") String date){
+        return financialServices.getIncomesAndExpensesAmount(date);
     }
 }

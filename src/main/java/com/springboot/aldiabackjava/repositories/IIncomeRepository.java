@@ -15,5 +15,9 @@ public interface IIncomeRepository extends JpaRepository<Income,Integer> {
 
 
     @Query("SELECT i FROM Income i WHERE i.user.idUser = :id_user AND DATE_FORMAT(i.date, '%Y-%m') = :yearMonth")
-    Page<Income> findByUserIdAndYearMonth(@Param("id_user") int idUser, @Param("yearMonth") String yearMonth, Pageable pageable);
+    Page<Income> findByUserIdAndYearMonthPageable(@Param("id_user") int idUser, @Param("yearMonth") String yearMonth, Pageable pageable);
+
+
+    @Query("SELECT i FROM Income i WHERE i.user.idUser = :id_user AND DATE_FORMAT(i.date, '%Y-%m') = :yearMonth")
+    List<Income> findByUserIdAndYearMonth(@Param("id_user") int idUser, @Param("yearMonth") String yearMonth);
 }

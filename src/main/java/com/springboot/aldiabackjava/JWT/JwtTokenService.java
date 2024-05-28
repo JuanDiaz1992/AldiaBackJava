@@ -37,7 +37,7 @@ public class JwtTokenService {
                 .setClaims(extraClaims)
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+1000*60*24))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // Una semana
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -18,7 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @AllArgsConstructor
@@ -33,7 +36,7 @@ public class FinancialServices {
 
     public ResponseEntity<Page<Income>> getIncomesForMounthService(String date, Pageable pageable) {
         User user = jwtInterceptor.getCurrentUser();
-        Page<Income> incomesPage = iIncomeRepository.findByUserIdAndYearMonth(user.getIdUser(), date, pageable);
+        Page<Income> incomesPage = iIncomeRepository.findByUserIdAndYearMonthPageable(user.getIdUser(), date, pageable);
 
         if (incomesPage.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(incomesPage);
@@ -103,7 +106,7 @@ public class FinancialServices {
 
     public ResponseEntity<Page<Expense>> getExpensesForMounthService(String date,Pageable pageable){
         User user = jwtInterceptor.getCurrentUser();
-        Page<Expense> expenses = iExpenseRespository.findByUserIdAndYearMonth(user.getIdUser(),date, pageable);
+        Page<Expense> expenses = iExpenseRespository.findByUserIdAndYearMonthPageable(user.getIdUser(),date, pageable);
         if (expenses.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenses);
         }
@@ -128,5 +131,35 @@ public class FinancialServices {
         }else {
             return ResponseEntity.badRequest().body("Ah ocurrido un error al eliminar el registro");
         }
+    }
+
+
+    //Expenses and Incomes together
+    public ResponseEntity<Map<String, Integer>> getIncomesAndExpensesAmount(String date){
+        Map<String,Integer> list = new HashMap<>();
+        User user = jwtInterceptor.getCurrentUser();
+        List<Expense> expenses = iExpenseRespository.findByUserIdAndYearMonth(user.getIdUser(),date);
+        List<Income> incomes = iIncomeRepository.findByUserIdAndYearMonth(user.getIdUser(), date);
+        AtomicInteger totalCashExpenses = new AtomicInteger();
+        AtomicInteger totalCahsIncomes = new AtomicInteger();
+        if (!expenses.isEmpty()){
+            expenses.forEach(expense -> {
+                totalCashExpenses.addAndGet(expense.getAmount());
+            });
+            list.put("expenses",totalCashExpenses.get());
+        }
+        if (!incomes.isEmpty()){
+            incomes.forEach(income -> {
+                totalCahsIncomes.addAndGet(income.getAmount());
+            });
+            list.put("income",totalCahsIncomes.get());
+        }
+        if(!list.isEmpty()){
+            return ResponseEntity.ok().body(list);
+        }else {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+
     }
 }

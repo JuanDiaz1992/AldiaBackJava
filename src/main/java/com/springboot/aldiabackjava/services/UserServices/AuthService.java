@@ -4,6 +4,7 @@ package com.springboot.aldiabackjava.services.UserServices;
 import com.springboot.aldiabackjava.JWT.JwtTokenService;
 import com.springboot.aldiabackjava.config.JwtInterceptor;
 import com.springboot.aldiabackjava.models.userModels.Rol;
+import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.BasicUserResponse;
 import com.springboot.aldiabackjava.utils.DataValidate;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.LoginRequest;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
@@ -35,6 +36,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -55,14 +58,26 @@ public class AuthService {
 
 
 
-    public String loginUserService(LoginRequest request) {
+    public BasicUserResponse loginUserService(LoginRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
-        UserDetails user = iUserRepository.findByUsername(request.getUsername()).orElseThrow();
+        User user = iUserRepository.findByUsername(request.getUsername()).orElseThrow();
         String token = jwtTokenService.getToken(user);
-        return token;
-
+        if (!token.isEmpty()){
+            BasicUserResponse basicUserResponse = new BasicUserResponse().builder()
+                    .token(token)
+                    .idUser(user.getIdUser())
+                    .username(user.getUsername())
+                    .firtsName(user.getProfile().getFirstName())
+                    .middleName(user.getProfile().getMiddleName())
+                    .lastName(user.getProfile().getLastName())
+                    .surnamen(user.getProfile().getSurnamen())
+                    .rol(String.valueOf(user.getRol()))
+                    .photo(user.getProfile().getProfilePicture())
+                    .build();
+            return basicUserResponse;
+        }
+        return null;
     }
-
     public ResponseEntity<String> registerUserService(RegisterRequest request) {
         String isUsernameOk = dataValidate.validateUserName(request.getUsername());
         String isPasswordOk = dataValidate.validatePassword(request.getPassword());

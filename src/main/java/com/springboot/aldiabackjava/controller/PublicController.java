@@ -1,6 +1,7 @@
 package com.springboot.aldiabackjava.controller;
 
 
+import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.BasicUserResponse;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.LoginRequest;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
 import com.springboot.aldiabackjava.services.UserServices.AuthService;
@@ -11,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/public")
 @RequiredArgsConstructor
@@ -20,12 +24,12 @@ public class PublicController {
 
 
     @PostMapping(value = "login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest request){
-        String response = authService.loginUserService(request);
-        if (!response.isEmpty()){
-            return ResponseEntity.ok(response);
+    public ResponseEntity<BasicUserResponse> loginUser(@RequestBody LoginRequest request){
+        BasicUserResponse result = authService.loginUserService(request);
+        if (result != null){
+            return ResponseEntity.ok(result);
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
     @PostMapping(value = "register", consumes = {"multipart/form-data"})
