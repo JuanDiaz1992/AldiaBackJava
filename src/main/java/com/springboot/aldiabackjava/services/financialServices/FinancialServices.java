@@ -162,4 +162,30 @@ public class FinancialServices {
 
 
     }
+
+    public ResponseEntity<Map<String, Integer>> getIncomesAndExpensesYear(String date){
+        Map<String,Integer> list = new HashMap<>();
+        User user = jwtInterceptor.getCurrentUser();
+        List<Expense> expenses = iExpenseRespository.findByUserIdAndYear(user.getIdUser(),date);
+        List<Income> incomes = iIncomeRepository.findByUserIdAndYear(user.getIdUser(), date);
+        AtomicInteger totalCashExpenses = new AtomicInteger();
+        AtomicInteger totalCahsIncomes = new AtomicInteger();
+        if (!expenses.isEmpty()){
+            expenses.forEach(expense -> {
+                totalCashExpenses.addAndGet(expense.getAmount());
+            });
+            list.put("expenses",totalCashExpenses.get());
+        }
+        if (!incomes.isEmpty()){
+            incomes.forEach(income -> {
+                totalCahsIncomes.addAndGet(income.getAmount());
+            });
+            list.put("income",totalCahsIncomes.get());
+        }
+        if(!list.isEmpty()){
+            return ResponseEntity.ok().body(list);
+        }else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 }

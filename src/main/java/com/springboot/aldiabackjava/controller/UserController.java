@@ -46,11 +46,6 @@ public class UserController {
         return authService.changerPictureProfilService(photoBase64);
     }
 
-    @GetMapping("/picture")
-    public ResponseEntity<byte[]> getProfilePicture(){
-        return authService.getUserProfilePictureService();
-    }
-
     @DeleteMapping("/delete/picture")
     public ResponseEntity<String> deleteProfilePicture(){
         return authService.deleteProfilePictureService();

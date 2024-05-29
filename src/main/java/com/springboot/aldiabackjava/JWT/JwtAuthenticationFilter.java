@@ -30,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenService jwtService;
     private final UserDetailsService userDetailsService;
     private final IUserRepository iUserRepository;
+    private final String staticImageBasePath = "/img/users/";
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -49,6 +50,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        // Check if request is for static image and user-specific path
+        String requestPath = request.getRequestURI();
+        if (requestPath.startsWith(staticImageBasePath)) {
+            int usernameStartIndex = staticImageBasePath.length();
+            int usernameEndIndex = requestPath.indexOf('/', usernameStartIndex + 1); // Find next "/" after base path and username
+
+            if (usernameEndIndex > -1) {
+                String requestedUsername = requestPath.substring(usernameStartIndex, usernameEndIndex);
+                if (!requestedUsername.equals(username)) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+                    return;
+                }
             }
         }
 

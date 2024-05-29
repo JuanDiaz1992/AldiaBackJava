@@ -70,4 +70,9 @@ public class FinancialDataController {
     public ResponseEntity<Map<String,Integer>> getExpensesAndIncomesAmountForMounth(@PathVariable("month") String date){
         return financialServices.getIncomesAndExpensesAmount(date);
     }
+
+    @GetMapping("/allAmount/year/{year}")
+    public ResponseEntity<Map<String,Integer>> getExpensesAndIncomesAmountForYear(@PathVariable("year") String date){
+        return financialServices.getIncomesAndExpensesYear(date);
+    }
 }

@@ -194,21 +194,7 @@ public class AuthService {
 
     }
 
-    public ResponseEntity<byte[]> getUserProfilePictureService() {
-        User user = jwtInterceptor.getCurrentUser();
-        Path path = Paths.get("src/main/resources/static"+user.getProfile().getProfilePicture());
-        try {
-            Resource resource = new UrlResource(path.toUri());
-            byte[] imageContent = IOUtils.toByteArray(resource.getInputStream());
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
-            headers.setContentLength(imageContent.length);
-            return new ResponseEntity<>(imageContent, headers, HttpStatus.OK);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+
 
     public ResponseEntity<String> deleteProfilePictureService() {
         User user = jwtInterceptor.getCurrentUser();
