@@ -13,24 +13,17 @@ import com.springboot.aldiabackjava.models.userModels.User;
 import com.springboot.aldiabackjava.repositories.IProfileRepository;
 import com.springboot.aldiabackjava.repositories.IUserRepository;
 ;
+import com.springboot.aldiabackjava.utils.GetCodeNow;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
-import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,7 +31,7 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+
 
 
 @Slf4j
@@ -55,7 +48,7 @@ public class AuthService {
     private final JwtTokenService jwtTokenService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-
+    private static final String USER_PHOTOS_BASE_PATH = "F:/Archivos/Desktop/DEV/JAVA/AlDiaBack/";
 
 
     public BasicUserResponse loginUserService(LoginRequest request) {
@@ -78,6 +71,7 @@ public class AuthService {
         }
         return null;
     }
+
     public ResponseEntity<String> registerUserService(RegisterRequest request) {
         String isUsernameOk = dataValidate.validateUserName(request.getUsername());
         String isPasswordOk = dataValidate.validatePassword(request.getPassword());
@@ -167,34 +161,38 @@ public class AuthService {
 
     }
 
-    public ResponseEntity<String> changerPictureProfilService(String photo) {
+    public ResponseEntity<Map<String, String>> changerPictureProfilService(String photo) {
+        Map response =  new HashMap<>();
         try {
             byte[] decodedBytes = Base64.getDecoder().decode(photo);
             User user = jwtInterceptor.getCurrentUser();
-            String directory = "src/main/resources/static/img/users/" + user.getUsername() + "/";
+            String directory = USER_PHOTOS_BASE_PATH + "img/users/" + user.getUsername() + "/";
             Path path = Paths.get(directory);
             Files.createDirectories(path); // crea el directorio si este no existe.
-            String filename = "profile.webp";
+            String filename = GetCodeNow.getCode() + "profile.webp";
             Path imagePath = path.resolve(filename);
             String currentProfilePicturePath = user.getProfile().getProfilePicture();
-            if (currentProfilePicturePath != "/img/sin_imagen.webp") {
-                Path currentProfilePicture = Paths.get("src/main/resources/static"+currentProfilePicturePath);
+            if (!"/img/sin_imagen.webp".equals(currentProfilePicturePath)) {
+                Path currentProfilePicture = Paths.get(USER_PHOTOS_BASE_PATH + currentProfilePicturePath);
                 if (Files.exists(currentProfilePicture)) {
                     Files.delete(currentProfilePicture);
                 }
             }
             Files.write(imagePath, decodedBytes);
             Profile profile = user.getProfile();
-            profile.setProfilePicture("/img/users/" + user.getUsername() +"/"+ filename);
+            String finalPaht = "/img/users/" + user.getUsername() + "/" + filename;
+            profile.setProfilePicture(finalPaht);
             iProfileRepository.save(profile);
-            return ResponseEntity.ok().body("Cambio exitoso");
-        }catch (IOException e){
-            return ResponseEntity.badRequest().body("A ocurrido un error, intentelo de nuevo.");
+            response.put("message", "Cambio exitoso");
+            response.put("status", "200");
+            response.put("url",finalPaht);
+            return ResponseEntity.ok().body(response);
+        } catch (IOException e) {
+            response.put("message", "A ocurrido un error, intentelo de nuevo.");
+            response.put("status", "400");
+            return ResponseEntity.badRequest().body(response);
         }
-
     }
-
-
 
     public ResponseEntity<String> deleteProfilePictureService() {
         User user = jwtInterceptor.getCurrentUser();

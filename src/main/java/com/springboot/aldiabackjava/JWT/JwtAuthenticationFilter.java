@@ -57,8 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestPath = request.getRequestURI();
         if (requestPath.startsWith(staticImageBasePath)) {
             int usernameStartIndex = staticImageBasePath.length();
-            int usernameEndIndex = requestPath.indexOf('/', usernameStartIndex + 1); // Find next "/" after base path and username
-
+            int usernameEndIndex = requestPath.indexOf('/', usernameStartIndex + 1);
             if (usernameEndIndex > -1) {
                 String requestedUsername = requestPath.substring(usernameStartIndex, usernameEndIndex);
                 if (!requestedUsername.equals(username)) {

@@ -40,6 +40,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
             this.currentUser = user;
         }
+
         return true;
     }
 

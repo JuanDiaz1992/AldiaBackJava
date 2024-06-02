@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @PutMapping("/edit/picture")
-    public ResponseEntity<String> changeProfilePicture(@RequestBody Map<String, String> picture){
+    public ResponseEntity<Map<String,String>> changeProfilePicture(@RequestBody Map<String, String> picture){
         String photoBase64  = picture.get("photo");
         return authService.changerPictureProfilService(photoBase64);
     }
