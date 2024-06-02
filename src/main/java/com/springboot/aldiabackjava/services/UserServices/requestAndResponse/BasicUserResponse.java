@@ -13,7 +13,7 @@ public class BasicUserResponse {
     private String token;
     private int idUser;
     private String username;
-    private String firtsName;
+    private String firstName;
     private String middleName;
     private String lastName;
     private String surnamen;

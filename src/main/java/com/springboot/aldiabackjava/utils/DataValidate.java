@@ -16,8 +16,8 @@ public class DataValidate {
 
 
     public String validatePassword(String password){
-        if (password.isEmpty()) {
-            return "La nueva contraseña no puede estar vacía";
+        if (password == null) {
+            return "La contraseña no puede estar vacía";
         }
         if (password.length() < 8){
             return "La nueva contraseña debe tener más de 8 caracteres";

@@ -16,11 +16,11 @@ public class Profile {
     private int idPRofile;
     @Column(name="first_name")
     private String firstName;
-    @Column(name="middle_name")
+    @Column(name="middle_name",nullable = true)
     private String middleName;
     @Column(name="last_name")
     private String lastName;
-    @Column(name="surname")
+    @Column(name="surname",nullable = true)
     private String surnamen;
     @Column(name="type_document")
     private TypeDocument typeDocument;

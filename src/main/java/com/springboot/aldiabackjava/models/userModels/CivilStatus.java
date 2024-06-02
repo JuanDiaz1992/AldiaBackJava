@@ -5,5 +5,7 @@ public enum CivilStatus {
     SOLTERO,
     CASADO,
     UNIONLIBRE,
-    DIVORCIADO
+    DIVORCIADO,
+    SEPARADO,
+    VIUDO
 }

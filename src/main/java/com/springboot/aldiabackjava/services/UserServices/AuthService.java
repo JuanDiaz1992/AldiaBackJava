@@ -3,24 +3,20 @@ package com.springboot.aldiabackjava.services.UserServices;
 
 import com.springboot.aldiabackjava.JWT.JwtTokenService;
 import com.springboot.aldiabackjava.config.JwtInterceptor;
-import com.springboot.aldiabackjava.models.userModels.Rol;
-import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.BasicUserResponse;
 import com.springboot.aldiabackjava.utils.DataValidate;
-import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.LoginRequest;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
 import com.springboot.aldiabackjava.models.userModels.Profile;
 import com.springboot.aldiabackjava.models.userModels.User;
 import com.springboot.aldiabackjava.repositories.IProfileRepository;
 import com.springboot.aldiabackjava.repositories.IUserRepository;
-;
 import com.springboot.aldiabackjava.utils.GetCodeNow;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,75 +44,9 @@ public class AuthService {
     private final JwtTokenService jwtTokenService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private static final String USER_PHOTOS_BASE_PATH = "F:/Archivos/Desktop/DEV/JAVA/AlDiaBack/";
 
-
-    public BasicUserResponse loginUserService(LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
-        User user = iUserRepository.findByUsername(request.getUsername()).orElseThrow();
-        String token = jwtTokenService.getToken(user);
-        if (!token.isEmpty()){
-            BasicUserResponse basicUserResponse = new BasicUserResponse().builder()
-                    .token(token)
-                    .idUser(user.getIdUser())
-                    .username(user.getUsername())
-                    .firtsName(user.getProfile().getFirstName())
-                    .middleName(user.getProfile().getMiddleName())
-                    .lastName(user.getProfile().getLastName())
-                    .surnamen(user.getProfile().getSurnamen())
-                    .rol(String.valueOf(user.getRol()))
-                    .photo(user.getProfile().getProfilePicture())
-                    .build();
-            return basicUserResponse;
-        }
-        return null;
-    }
-
-    public ResponseEntity<String> registerUserService(RegisterRequest request) {
-        String isUsernameOk = dataValidate.validateUserName(request.getUsername());
-        String isPasswordOk = dataValidate.validatePassword(request.getPassword());
-        String isEmailOk = dataValidate.validateEmail(request.getEmail());
-        String isDocumentOk = dataValidate.validateDocument(request.getDocument());
-        if (isUsernameOk != null){
-            return ResponseEntity.badRequest().body(isUsernameOk);
-        }
-        if (isPasswordOk != null ){
-            return ResponseEntity.badRequest().body(isPasswordOk);
-        }
-        if (isEmailOk != null){
-            return ResponseEntity.badRequest().body(isEmailOk);
-        }
-        if (isDocumentOk != null){
-            return ResponseEntity.badRequest().body(isDocumentOk);
-        }
-        Profile profile = Profile.builder()
-                .firstName(request.getFirstName())
-                .middleName(request.getMiddleName())
-                .lastName(request.getLastName())
-                .surnamen(request.getSurnamen())
-                .typeDocument(request.getTypeDocument())
-                .document(request.getDocument())
-                .profilePicture("src/main/resources/static/img/sin_imagen.webp")
-                .birthDate(request.getBirthDate())
-                .department(request.getDepartment())
-                .town(request.getTown())
-                .address(request.getAddress())
-                .civilStatus(request.getCivilStatus())
-                .numberPhone(request.getNumberPhone())
-                .email(request.getEmail())
-                .occupation(request.getOccupation())
-                .dataTreatment(request.getDataTreatment())
-                .exogenous(request.getExogenous()).build();
-        profile = iProfileRepository.save(profile);
-        User user = User.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode( request.getPassword()))
-                .rol(Rol.USER)
-                .profile(profile).build();
-        iUserRepository.save(user);
-        String token = jwtTokenService.getToken(user);
-        return ResponseEntity.ok().body(token);
-    }
+    @Value("${path.to.prop.name}")
+    private String USER_PHOTOS_BASE_PATH;
 
     public User getUserService() {
         User user = jwtInterceptor.getCurrentUser();
@@ -166,17 +96,21 @@ public class AuthService {
         try {
             byte[] decodedBytes = Base64.getDecoder().decode(photo);
             User user = jwtInterceptor.getCurrentUser();
-            String directory = USER_PHOTOS_BASE_PATH + "img/users/" + user.getUsername() + "/";
+            String directory = this.USER_PHOTOS_BASE_PATH + "img/users/" + user.getUsername() + "/";
             Path path = Paths.get(directory);
             Files.createDirectories(path); // crea el directorio si este no existe.
             String filename = GetCodeNow.getCode() + "profile.webp";
             Path imagePath = path.resolve(filename);
             String currentProfilePicturePath = user.getProfile().getProfilePicture();
-            if (!"/img/sin_imagen.webp".equals(currentProfilePicturePath)) {
-                Path currentProfilePicture = Paths.get(USER_PHOTOS_BASE_PATH + currentProfilePicturePath);
-                if (Files.exists(currentProfilePicture)) {
-                    Files.delete(currentProfilePicture);
+            try {
+                if (!"/img/sin_imagen.webp".equals(currentProfilePicturePath)) {
+                    Path currentProfilePicture = Paths.get(this.USER_PHOTOS_BASE_PATH + currentProfilePicturePath);
+                    if (Files.exists(currentProfilePicture)) {
+                        Files.delete(currentProfilePicture);
+                    }
                 }
+            }catch (Exception e){
+                log.error("Cambio de foto de usuario nuevo.");
             }
             Files.write(imagePath, decodedBytes);
             Profile profile = user.getProfile();
@@ -209,5 +143,6 @@ public class AuthService {
         return ResponseEntity.ok().body("Foto eliminada");
 
     }
+
 
 }

@@ -96,8 +96,6 @@
             <version>2.11.0</version> <!-- Reemplaza con la última versión -->
         </dependency>
     </dependencies>
-
-
     <build>
         <plugins>
             <plugin>
