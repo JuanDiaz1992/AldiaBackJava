@@ -1,8 +1,5 @@
 package com.springboot.aldiabackjava.JWT;
 
-import com.springboot.aldiabackjava.models.userModels.Rol;
-import com.springboot.aldiabackjava.models.userModels.User;
-import com.springboot.aldiabackjava.repositories.IUserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +26,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtService;
     private final UserDetailsService userDetailsService;
-    private final IUserRepository iUserRepository;
     private final String staticImageBasePath = "/img/users/";
 
     @Override
