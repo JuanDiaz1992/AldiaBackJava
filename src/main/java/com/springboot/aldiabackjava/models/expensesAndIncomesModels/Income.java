@@ -22,13 +22,15 @@ public class Income {
     @Column(name="id_income")
     private int idIncome;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @JsonIgnore
     private User user;
     Date date;
     int amount;
     String description;
-    int category;
+    @ManyToOne
+    @JoinColumn(name = "category", referencedColumnName = "id_category")
+    CategoryIncomes category;
     String picture;
 }

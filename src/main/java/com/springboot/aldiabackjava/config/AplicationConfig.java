@@ -1,7 +1,7 @@
 package com.springboot.aldiabackjava.config;
 
 
-import com.springboot.aldiabackjava.repositories.IUserRepository;
+import com.springboot.aldiabackjava.repositories.userRepositories.IUserRepository;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

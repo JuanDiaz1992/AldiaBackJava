@@ -23,14 +23,16 @@ public class Expense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @JsonIgnore
     private User user;
     Date date;
     int amount;
     String description;
-    int category;
+    @ManyToOne
+    @JoinColumn(name = "category", referencedColumnName = "id_category")
+    CategoryExpenses category;
     String picture;
 
 }

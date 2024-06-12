@@ -1,4 +1,4 @@
-package com.springboot.aldiabackjava.repositories;
+package com.springboot.aldiabackjava.repositories.userRepositories;
 
 import com.springboot.aldiabackjava.models.userModels.Profile;
 import org.springframework.data.repository.CrudRepository;

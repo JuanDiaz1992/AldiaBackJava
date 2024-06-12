@@ -4,8 +4,8 @@ import com.springboot.aldiabackjava.JWT.JwtTokenService;
 import com.springboot.aldiabackjava.models.userModels.Profile;
 import com.springboot.aldiabackjava.models.userModels.Rol;
 import com.springboot.aldiabackjava.models.userModels.User;
-import com.springboot.aldiabackjava.repositories.IProfileRepository;
-import com.springboot.aldiabackjava.repositories.IUserRepository;
+import com.springboot.aldiabackjava.repositories.userRepositories.IProfileRepository;
+import com.springboot.aldiabackjava.repositories.userRepositories.IUserRepository;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.BasicUserResponse;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.LoginRequest;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
@@ -152,7 +152,7 @@ public class PublicServices {
         response.put("rol", String.valueOf(user.getRol()));
         response.put("photo", user.getProfile().getProfilePicture());
         response.put("status", "200");
-        response.put("message","Bienvenido "+user.getProfile().getFirstName());
+        response.put("message","Bienvenido "+user.getProfile().getFirstName()+", ahora puedes iniciar sesión");
         return ResponseEntity.ok().body(response);
     }
 

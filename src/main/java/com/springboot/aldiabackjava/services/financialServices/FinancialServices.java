@@ -2,15 +2,21 @@ package com.springboot.aldiabackjava.services.financialServices;
 
 
 import com.springboot.aldiabackjava.config.JwtInterceptor;
+import com.springboot.aldiabackjava.models.expensesAndIncomesModels.CategoryExpenses;
+import com.springboot.aldiabackjava.models.expensesAndIncomesModels.CategoryIncomes;
 import com.springboot.aldiabackjava.models.expensesAndIncomesModels.Expense;
 import com.springboot.aldiabackjava.models.expensesAndIncomesModels.Income;
 import com.springboot.aldiabackjava.models.userModels.User;
-import com.springboot.aldiabackjava.repositories.IExpenseRespository;
-import com.springboot.aldiabackjava.repositories.IIncomeRepository;
+import com.springboot.aldiabackjava.repositories.expensesAndIncomesRepositories.IExpenseRespository;
+import com.springboot.aldiabackjava.repositories.expensesAndIncomesRepositories.IExpensesCategoryRespository;
+import com.springboot.aldiabackjava.repositories.expensesAndIncomesRepositories.IIncomeRepository;
+import com.springboot.aldiabackjava.repositories.expensesAndIncomesRepositories.IIncomesCategoryRespository;
 import com.springboot.aldiabackjava.services.financialServices.requestAndResponses.IncomeOrExpense;
-import lombok.AllArgsConstructor;
+import com.springboot.aldiabackjava.utils.GetDateNow;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,19 +24,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class FinancialServices {
     private final IIncomeRepository iIncomeRepository;
     private final IExpenseRespository iExpenseRespository;
+    private final IIncomesCategoryRespository iIncomesCategoryRespository;
+    private final IExpensesCategoryRespository iExpensesCategoryRespository;
+    @Value("${path.to.prop.name}")
+    private String USER_PHOTOS_BASE_PATH;
     @Autowired
     private JwtInterceptor jwtInterceptor;
+
 
     //Incomes Services
 
@@ -54,21 +67,30 @@ public class FinancialServices {
         return ResponseEntity.ok().body(incomes);
     }
 
-    public ResponseEntity<String> insertIncomesService(IncomeOrExpense incomeOrExpense){
+    public ResponseEntity<Map<String,String>> insertIncomesService(IncomeOrExpense incomeOrExpense){
+        Map<String,String>response = new HashMap<>();
         try {
             User user = jwtInterceptor.getCurrentUser();
+            String finalPaht = "";
+            if (!incomeOrExpense.getPicture().isEmpty()){
+                finalPaht = this.createPicture(user,"incomes",incomeOrExpense);
+            }
             Income income = new Income().builder()
-                    .date(incomeOrExpense.getDate())
+                    .date(GetDateNow.formatDate(incomeOrExpense.getDate()))
                     .amount(incomeOrExpense.getAmount())
                     .description(incomeOrExpense.getDescription())
-                    .picture(incomeOrExpense.getPicture())
-                    .category(incomeOrExpense.getCategory())
+                    .category(incomeOrExpense.getCategoryIncomes())
+                    .picture(finalPaht)
                     .user(user)
                     .build();
-            int id = iIncomeRepository.save(income).getIdIncome();
-            return ResponseEntity.ok().body("Registro guardado, id: "+id);
+            iIncomeRepository.save(income);
+            response.put("message","Registro guardado correctamente");
+            response.put("status","200");
+            return ResponseEntity.ok().body(response);
         }catch (Exception e){
-            return ResponseEntity.ok().body("Ah ocurrido un error al guardar el registro");
+            response.put("message","Ah ocurrido un error al guardar el registro");
+            response.put("status","409");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
     }
 
@@ -83,24 +105,38 @@ public class FinancialServices {
         }
     }
 
+    public ResponseEntity<List>getCategoryIncomesServices(){
+        List<CategoryIncomes> list = iIncomesCategoryRespository.findAll();
+        return ResponseEntity.ok().body(list);
+    }
+
 
     //Expenses Services
 
-    public ResponseEntity<String> insertExpensesService(IncomeOrExpense incomeOrExpense) {
+    public ResponseEntity<Map<String,String>> insertExpensesService(IncomeOrExpense incomeOrExpense) {
+        Map<String,String>response = new HashMap<>();
         try {
             User user = jwtInterceptor.getCurrentUser();
-            Expense income = new Expense().builder()
-                    .date(incomeOrExpense.getDate())
+            String finalPaht = "";
+            if (!incomeOrExpense.getPicture().isEmpty()){
+                finalPaht = this.createPicture(user,"expenses",incomeOrExpense);
+            }
+            Expense expense = new Expense().builder()
+                    .date(GetDateNow.formatDate(incomeOrExpense.getDate()))
                     .amount(incomeOrExpense.getAmount())
                     .description(incomeOrExpense.getDescription())
-                    .picture(incomeOrExpense.getPicture())
-                    .category(incomeOrExpense.getCategory())
+                    .picture(finalPaht)
+                    .category(incomeOrExpense.getCategoryExpenses())
                     .user(user)
                     .build();
-            int id = iExpenseRespository.save(income).getId();
-            return ResponseEntity.ok().body("Registro guardado, id: "+id);
+            iExpenseRespository.save(expense);
+            response.put("message","Registro guardado correctamente");
+            response.put("status","200");
+            return ResponseEntity.ok().body(response);
         }catch (Exception e){
-            return ResponseEntity.ok().body("Ah ocurrido un error al guardar el registro");
+            response.put("message","Ah ocurrido un error al guardar el registro");
+            response.put("status","409");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
     }
 
@@ -133,6 +169,10 @@ public class FinancialServices {
         }
     }
 
+    public ResponseEntity<List>getCategoryExpensesServices(){
+        List<CategoryExpenses> list = iExpensesCategoryRespository.findAll();
+        return ResponseEntity.ok().body(list);
+    }
 
     //Expenses and Incomes together
     public ResponseEntity<Map<String, Integer>> getIncomesAndExpensesAmount(String date){
@@ -188,4 +228,26 @@ public class FinancialServices {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+
+    public String createPicture(User user,String type, IncomeOrExpense incomeOrExpense){
+        String dateFormated = GetDateNow.getOnlyYearAndMonth(incomeOrExpense.getDate());
+        byte[] decodedBytes = Base64.getDecoder().decode(incomeOrExpense.getPicture());
+        String directory = this.USER_PHOTOS_BASE_PATH + "img/users/" + user.getUsername() + "/"+type+"/" + dateFormated +"/";
+        Path path = Paths.get(directory);
+        try {
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String filename = GetDateNow.getCode() + ".webp";
+        Path imagePath = path.resolve(filename);
+        try {
+            Files.write(imagePath, decodedBytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return "/img/users/" + user.getUsername() + "/" + type + "/" + dateFormated + "/" + filename;
+    }
+
 }

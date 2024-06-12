@@ -6,6 +6,7 @@ import com.springboot.aldiabackjava.models.expensesAndIncomesModels.Income;
 import com.springboot.aldiabackjava.services.financialServices.FinancialServices;
 import com.springboot.aldiabackjava.services.financialServices.requestAndResponses.IncomeOrExpense;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/users/financial")
 @AllArgsConstructor
@@ -34,7 +36,7 @@ public class FinancialDataController {
     }
 
     @PostMapping("/incomes")
-    public ResponseEntity<String> insertIncome(@RequestBody IncomeOrExpense income){
+    public ResponseEntity<Map<String,String>> insertIncome(@RequestBody IncomeOrExpense income){
         return financialServices.insertIncomesService(income);
     }
 
@@ -56,7 +58,7 @@ public class FinancialDataController {
     }
 
     @PostMapping("/expenses")
-    public ResponseEntity<String> insertExpenses(@RequestBody IncomeOrExpense expense){
+    public ResponseEntity<Map<String,String>> insertExpenses(@RequestBody IncomeOrExpense expense){
         return financialServices.insertExpensesService(expense);
     }
 
@@ -74,5 +76,14 @@ public class FinancialDataController {
     @GetMapping("/allAmount/year/{year}")
     public ResponseEntity<Map<String,Integer>> getExpensesAndIncomesAmountForYear(@PathVariable("year") String date){
         return financialServices.getIncomesAndExpensesYear(date);
+    }
+
+    @GetMapping("/categories/{typeCategory}")
+    public ResponseEntity<List> getCategorys(@PathVariable("typeCategory") String typeCategory){
+        if (typeCategory.equals("incomes")){
+            return financialServices.getCategoryIncomesServices();
+        }else{
+            return financialServices.getCategoryExpensesServices();
+        }
     }
 }

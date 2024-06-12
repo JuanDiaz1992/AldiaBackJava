@@ -2,11 +2,9 @@ package com.springboot.aldiabackjava.config;
 
 import com.springboot.aldiabackjava.JWT.JwtTokenService;
 import com.springboot.aldiabackjava.models.userModels.User;
-import com.springboot.aldiabackjava.repositories.IUserRepository;
-import jakarta.servlet.ServletException;
+import com.springboot.aldiabackjava.repositories.userRepositories.IUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,9 +13,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.io.IOException;
-import java.util.Optional;
 
 @Component
 

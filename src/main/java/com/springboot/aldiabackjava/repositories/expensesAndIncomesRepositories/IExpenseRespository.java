@@ -1,4 +1,4 @@
-package com.springboot.aldiabackjava.repositories;
+package com.springboot.aldiabackjava.repositories.expensesAndIncomesRepositories;
 
 ;
 import com.springboot.aldiabackjava.models.expensesAndIncomesModels.Expense;
@@ -12,14 +12,14 @@ import java.util.List;
 
 
 public interface IExpenseRespository extends JpaRepository<Expense, Integer> {
-    @Query("SELECT e FROM Expense e WHERE e.user.idUser = :id_user AND YEAR(e.date) = :year")
+
+    @Query("SELECT e FROM Expense e WHERE e.user.idUser = :id_user AND EXTRACT(YEAR FROM e.date) = :year")
     List<Expense> findByUserIdAndYear(@Param("id_user") int idUser, @Param("year") String year);
 
-    @Query("SELECT e FROM Expense e WHERE e.user.idUser = :id_user AND DATE_FORMAT(e.date, '%Y-%m') = :yearMonth")
+    @Query("SELECT e FROM Expense e WHERE e.user.idUser = :id_user AND TO_CHAR(e.date, 'YYYY-MM') = :yearMonth")
     Page<Expense> findByUserIdAndYearMonthPageable(@Param("id_user") int idUser, @Param("yearMonth") String yearMonth, Pageable pageable);
 
-    @Query("SELECT e FROM Expense e WHERE e.user.idUser = :id_user AND DATE_FORMAT(e.date, '%Y-%m') = :yearMonth")
+    @Query("SELECT e FROM Expense e WHERE e.user.idUser = :id_user AND TO_CHAR(e.date, 'YYYY-MM') = :yearMonth")
     List<Expense> findByUserIdAndYearMonth(@Param("id_user") int idUser, @Param("yearMonth") String yearMonth);
-
-
 }
+

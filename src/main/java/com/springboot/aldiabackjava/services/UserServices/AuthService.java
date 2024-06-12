@@ -7,14 +7,15 @@ import com.springboot.aldiabackjava.utils.DataValidate;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
 import com.springboot.aldiabackjava.models.userModels.Profile;
 import com.springboot.aldiabackjava.models.userModels.User;
-import com.springboot.aldiabackjava.repositories.IProfileRepository;
-import com.springboot.aldiabackjava.repositories.IUserRepository;
-import com.springboot.aldiabackjava.utils.GetCodeNow;
+import com.springboot.aldiabackjava.repositories.userRepositories.IProfileRepository;
+import com.springboot.aldiabackjava.repositories.userRepositories.IUserRepository;
+import com.springboot.aldiabackjava.utils.GetDateNow;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -99,7 +100,7 @@ public class AuthService {
             String directory = this.USER_PHOTOS_BASE_PATH + "img/users/" + user.getUsername() + "/";
             Path path = Paths.get(directory);
             Files.createDirectories(path); // crea el directorio si este no existe.
-            String filename = GetCodeNow.getCode() + "profile.webp";
+            String filename = GetDateNow.getCode() + "profile.webp";
             Path imagePath = path.resolve(filename);
             String currentProfilePicturePath = user.getProfile().getProfilePicture();
             try {
@@ -124,7 +125,7 @@ public class AuthService {
         } catch (IOException e) {
             response.put("message", "A ocurrido un error, intentelo de nuevo.");
             response.put("status", "400");
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
     }
 
