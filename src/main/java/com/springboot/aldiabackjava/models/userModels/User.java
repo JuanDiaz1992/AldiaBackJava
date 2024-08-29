@@ -34,6 +34,7 @@ public class User implements UserDetails {
     @JoinColumn(name = "id_profile", referencedColumnName = "id_profile")
     private Profile profile;
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();

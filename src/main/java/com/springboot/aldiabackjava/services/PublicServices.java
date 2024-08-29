@@ -51,6 +51,7 @@ public class PublicServices {
                     .lastName(user.getProfile().getLastName())
                     .surnamen(user.getProfile().getSurnamen())
                     .rol(String.valueOf(user.getRol()))
+                    .occupation(user.getProfile().getOccupation())
                     .photo(user.getProfile().getProfilePicture())
                     .build();
             return basicUserResponse;

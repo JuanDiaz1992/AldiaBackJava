@@ -21,7 +21,7 @@ public class Expense {
     @Id
     @Column( name ="id_expense")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int idExpense;
 
     @ManyToOne
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")

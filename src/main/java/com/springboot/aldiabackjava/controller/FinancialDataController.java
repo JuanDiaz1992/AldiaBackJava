@@ -40,8 +40,8 @@ public class FinancialDataController {
         return financialServices.insertIncomesService(income);
     }
 
-    @DeleteMapping("/incomes/delete/{id}")
-    public ResponseEntity<String> deleteIncome(@PathVariable("id") int id){
+    @DeleteMapping("/incomes/delete/id/{id}")
+    public ResponseEntity<Map<String,String>> deleteIncome(@PathVariable("id") int id){
         return financialServices.deleteIncomeService(id);
     }
 
@@ -62,8 +62,8 @@ public class FinancialDataController {
         return financialServices.insertExpensesService(expense);
     }
 
-    @DeleteMapping("/expenses/delete/{id}")
-    public ResponseEntity<String> deleteExpense(@PathVariable("id") int id){
+    @DeleteMapping("/expenses/delete/id/{id}")
+    public ResponseEntity<Map<String,String>> deleteExpense(@PathVariable("id") int id){
         return financialServices.deleteExpenseService(id);
     }
 

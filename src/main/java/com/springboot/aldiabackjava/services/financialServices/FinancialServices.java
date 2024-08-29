@@ -94,14 +94,25 @@ public class FinancialServices {
         }
     }
 
-    public ResponseEntity<String> deleteIncomeService(int incomeId){
+    public ResponseEntity<Map<String,String>> deleteIncomeService(int incomeId){
         User user = jwtInterceptor.getCurrentUser();
-        Income income = iIncomeRepository.findById(incomeId).orElse(null);
-        if (income != null && income.getUser().equals(user)){
-            iIncomeRepository.delete(income);
-            return ResponseEntity.ok().body("Registro eliminado correctamente");
-        }else {
-            return ResponseEntity.badRequest().body("Ah ocurrido un error al eliminar el registro");
+        Map<String,String> response = new HashMap<>();
+        try {
+            Income income = iIncomeRepository.findById(incomeId).orElse(null);
+            if (income != null && income.getUser().equals(user)){
+                iIncomeRepository.delete(income);
+                response.put("message","Registro eliminado correctamente");
+                response.put("status","200");
+                return ResponseEntity.ok().body(response);
+            }else{
+                response.put("message","El elemento no existe");
+                response.put("status","409");
+                return ResponseEntity.badRequest().body(response);
+            }
+        }catch (Exception e){
+            response.put("message","Ah ocurrido un error al eliminar el registro");
+            response.put("status","409");
+            return ResponseEntity.badRequest().body(response);
         }
     }
 
@@ -158,14 +169,24 @@ public class FinancialServices {
         return ResponseEntity.ok().body(expenses);
     }
 
-    public ResponseEntity<String> deleteExpenseService(int idExpense){
+    public ResponseEntity<Map<String,String>> deleteExpenseService(int idExpense){
         User user = jwtInterceptor.getCurrentUser();
-        Expense expense = iExpenseRespository.findById(idExpense).orElse(null);
-        if (expense != null && expense.getUser().equals(user)){
-            iExpenseRespository.delete(expense);
-            return ResponseEntity.ok().body("Registro eliminado correctamente");
-        }else {
-            return ResponseEntity.badRequest().body("Ah ocurrido un error al eliminar el registro");
+        Map<String,String> response = new HashMap<>();
+        try {
+            Expense expense = iExpenseRespository.findById(idExpense).orElse(null);
+            if (expense != null && expense.getUser().equals(user)){
+                iExpenseRespository.delete(expense);
+                response.put("message","Registro eliminado correctamente");
+                response.put("status","200");
+                return ResponseEntity.ok().body(response);
+            }
+            response.put("message","El elemento no existe");
+            response.put("status","409");
+            return ResponseEntity.badRequest().body(response);
+        }catch (Exception e){
+            response.put("message","Ah ocurrido un error al eliminar el registro");
+            response.put("status","409");
+            return ResponseEntity.badRequest().body(response);
         }
     }
 
