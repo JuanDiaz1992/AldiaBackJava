@@ -48,8 +48,7 @@ public class FinancialServices {
     private final IExpensesCategoryRespository iExpensesCategoryRespository;
     @Value("${path.to.prop.name}")
     private String USER_PHOTOS_BASE_PATH;
-    @Autowired
-    private Tesseract tesseract;
+
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
@@ -281,36 +280,5 @@ public class FinancialServices {
         return "/img/users/" + user.getUsername() + "/" + type + "/" + dateFormated + "/" + filename;
     }
 
-    public String recognizedText(InputStream inputStream) throws IOException {
-        BufferedImage image = ImageIO.read(inputStream);
-        try {
-            String text = tesseract.doOCR(image);
-            // Define regex pattern to find numbers with optional decimals and currency symbols
-            Pattern pattern = Pattern.compile("\\d*[.,]\\d+");
 
-            Matcher matcher = pattern.matcher(text);
-            List<String> numbers = new ArrayList<>();
-            while (matcher.find()) {
-                String temporalStr = matcher.group().replaceAll(",.*", "");
-                temporalStr = temporalStr.replace(".", "");
-                numbers.add(temporalStr);
-            }
-            List <Integer> cleanNumbers = new ArrayList<>();
-            for (String number : numbers) {
-                if (!number.isEmpty() && number != null && number!=null){
-                    Integer temporalNumber = Integer.valueOf(number);
-                    log.error(String.valueOf(temporalNumber));
-                    cleanNumbers.add(temporalNumber);
-                }
-
-            }
-
-            // Find the maximum value
-            Integer maxNumber = cleanNumbers.stream().max(Integer::compare).orElse(null);
-            return maxNumber.toString();
-        }catch (TesseractException e) {
-            e.printStackTrace();
-        }
-        return "failed";
-    }
 }

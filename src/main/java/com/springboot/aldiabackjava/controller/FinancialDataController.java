@@ -89,8 +89,5 @@ public class FinancialDataController {
         }
     }
 
-    @PostMapping("checkimg")
-    public String ckeck(@RequestParam MultipartFile img) throws IOException {
-        return financialServices.recognizedText(img.getInputStream());
-    }
+
 }
