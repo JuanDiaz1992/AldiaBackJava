@@ -34,5 +34,6 @@ public class Expense {
     @JoinColumn(name = "category", referencedColumnName = "id_category")
     CategoryExpenses category;
     String picture;
+    Boolean is_planned;
 
 }

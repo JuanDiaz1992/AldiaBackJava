@@ -22,4 +22,5 @@ public class IncomeOrExpense {
     CategoryExpenses categoryExpenses;
     CategoryIncomes categoryIncomes;
     String picture;
+    Boolean is_planned;
 }

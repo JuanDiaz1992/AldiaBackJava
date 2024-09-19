@@ -33,4 +33,5 @@ public class Income {
     @JoinColumn(name = "category", referencedColumnName = "id_category")
     CategoryIncomes category;
     String picture;
+    Boolean is_planned;
 }

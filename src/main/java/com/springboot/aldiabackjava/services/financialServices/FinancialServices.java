@@ -91,6 +91,7 @@ public class FinancialServices {
                     .category(incomeOrExpense.getCategoryIncomes())
                     .picture(finalPaht)
                     .user(user)
+                    .is_planned(incomeOrExpense.getIs_planned())
                     .build();
             iIncomeRepository.save(income);
             response.put("message","Registro guardado correctamente");
@@ -148,6 +149,7 @@ public class FinancialServices {
                     .picture(finalPaht)
                     .category(incomeOrExpense.getCategoryExpenses())
                     .user(user)
+                    .is_planned(incomeOrExpense.getIs_planned())
                     .build();
             iExpenseRespository.save(expense);
             response.put("message","Registro guardado correctamente");
