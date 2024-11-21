@@ -1,6 +1,5 @@
 package com.springboot.aldiabackjava.repositories.expensesAndIncomesRepositories;
 
-;
 import com.springboot.aldiabackjava.models.expensesAndIncomesModels.Expense;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
