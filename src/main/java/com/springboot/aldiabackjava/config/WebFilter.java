@@ -21,7 +21,7 @@ public class WebFilter implements WebMvcConfigurer {
     @Autowired
     private ResourceLoader resourceLoader; // Inject ResourceLoader
 
-    @Value("${path.to.prop.name}")
+    @Value("${user.photos.base.path}")
     private String USER_PHOTOS_BASE_PATH;
 
     @Override
@@ -39,6 +39,6 @@ public class WebFilter implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/img/users/**")
-                .addResourceLocations("file:///"+this.USER_PHOTOS_BASE_PATH+"img/users/");
+                .addResourceLocations("file:///"+this.USER_PHOTOS_BASE_PATH);
     }
 }

@@ -46,7 +46,7 @@ public class FinancialServices {
     private final IExpenseRespository iExpenseRespository;
     private final IIncomesCategoryRespository iIncomesCategoryRespository;
     private final IExpensesCategoryRespository iExpensesCategoryRespository;
-    @Value("${path.to.prop.name}")
+    @Value("${user.photos.base.path}")
     private String USER_PHOTOS_BASE_PATH;
 
     @Autowired
@@ -265,7 +265,7 @@ public class FinancialServices {
     public String createPicture(User user,String type, IncomeOrExpense incomeOrExpense){
         String dateFormated = GetDateNow.getOnlyYearAndMonth(incomeOrExpense.getDate());
         byte[] decodedBytes = Base64.getDecoder().decode(incomeOrExpense.getPicture());
-        String directory = this.USER_PHOTOS_BASE_PATH + "img/users/" + user.getUsername() + "/"+type+"/" + dateFormated +"/";
+        String directory = this.USER_PHOTOS_BASE_PATH + user.getUsername() + "/"+type+"/" + dateFormated +"/";
         Path path = Paths.get(directory);
         try {
             Files.createDirectories(path);
@@ -279,7 +279,7 @@ public class FinancialServices {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return "/img/users/" + user.getUsername() + "/" + type + "/" + dateFormated + "/" + filename;
+        return this.USER_PHOTOS_BASE_PATH + user.getUsername() + "/" + type + "/" + dateFormated + "/" + filename;
     }
 
 
