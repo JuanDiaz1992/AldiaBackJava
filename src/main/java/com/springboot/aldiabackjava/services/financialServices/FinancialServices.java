@@ -279,7 +279,7 @@ public class FinancialServices {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return this.USER_PHOTOS_BASE_PATH + user.getUsername() + "/" + type + "/" + dateFormated + "/" + filename;
+        return "/private/img/users" + user.getUsername() + "/" + type + "/" + dateFormated + "/" + filename;
     }
 
 
