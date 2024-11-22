@@ -49,6 +49,9 @@ public class AuthService {
     @Value("${user.photos.base.path}")
     private String USER_PHOTOS_BASE_PATH;
 
+    @Value("${user.folders.base.path}")
+    private String USER_FOLDERS_BASE_PATH;
+
     public User getUserService() {
         User user = jwtInterceptor.getCurrentUser();
         return user;
@@ -106,8 +109,8 @@ public class AuthService {
             String currentProfilePicturePath = user.getProfile().getProfilePicture();
 
             try {
-                if (!"/img/sin_imagen.webp".equals(currentProfilePicturePath)) {
-                    Path currentProfilePicture = Paths.get(this.USER_PHOTOS_BASE_PATH + currentProfilePicturePath);
+                if (!"private/img/sin_imagen.webp".equals(currentProfilePicturePath)) {
+                    Path currentProfilePicture = Paths.get(this.USER_FOLDERS_BASE_PATH + currentProfilePicturePath);
                     if (Files.exists(currentProfilePicture)) {
                         Files.delete(currentProfilePicture);
                     }
@@ -117,7 +120,7 @@ public class AuthService {
             }
             Files.write(imagePath, decodedBytes);
             Profile profile = user.getProfile();
-            String finalPath = "private/img/users/" + user.getUsername() + "/" + filename;
+            String finalPath = "/private/img/users/" + user.getUsername() + "/" + filename;
 
             profile.setProfilePicture(finalPath);
             iProfileRepository.save(profile);
