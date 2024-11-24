@@ -16,6 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class IncomeOrExpense {
     @JsonFormat(pattern = "yyyy-MM-dd")
+    int id = 0;
     Date date;
     int amount;
     String description;

@@ -89,5 +89,12 @@ public class FinancialDataController {
         }
     }
 
-
+    @PutMapping("/expenses/edit/")
+    public ResponseEntity<Map<String,String>> editExpense(@RequestBody IncomeOrExpense expense){
+        return financialServices.editExpense(expense);
+    }
+    @PutMapping("/incomes/edit/")
+    public ResponseEntity<Map<String,String>> editIncome(@RequestBody IncomeOrExpense income){
+        return financialServices.editIncome(income);
+    }
 }

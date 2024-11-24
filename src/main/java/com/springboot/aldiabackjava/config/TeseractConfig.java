@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class TeseractConfig {
-    @Value("${project.folder.base.path}")
-    private String FOLDER_BASE_PATH;
     @Bean
     Tesseract teseract(){
         Tesseract tesseract = new Tesseract();

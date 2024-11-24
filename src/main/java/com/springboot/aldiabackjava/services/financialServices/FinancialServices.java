@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -48,7 +49,8 @@ public class FinancialServices {
     private final IExpensesCategoryRespository iExpensesCategoryRespository;
     @Value("${user.photos.base.path}")
     private String USER_PHOTOS_BASE_PATH;
-
+    @Value("${user.folders.base.path}")
+    private String USER_FOLDERS_BASE_PATH;
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
@@ -82,7 +84,7 @@ public class FinancialServices {
             User user = jwtInterceptor.getCurrentUser();
             String finalPaht = "";
             if (!incomeOrExpense.getPicture().isEmpty()){
-                finalPaht = this.createPicture(user,"incomes",incomeOrExpense);
+                finalPaht = this.createPicture(user,"incomes",incomeOrExpense,null);
             }
             Income income = new Income().builder()
                     .date(GetDateNow.formatDate(incomeOrExpense.getDate()))
@@ -140,7 +142,7 @@ public class FinancialServices {
             User user = jwtInterceptor.getCurrentUser();
             String finalPaht = "";
             if (!incomeOrExpense.getPicture().isEmpty()){
-                finalPaht = this.createPicture(user,"expenses",incomeOrExpense);
+                finalPaht = this.createPicture(user,"expenses",incomeOrExpense, null);
             }
             Expense expense = new Expense().builder()
                     .date(GetDateNow.formatDate(incomeOrExpense.getDate()))
@@ -262,12 +264,18 @@ public class FinancialServices {
     }
 
 
-    public String createPicture(User user,String type, IncomeOrExpense incomeOrExpense){
+    public String createPicture(User user,String type, IncomeOrExpense incomeOrExpense, String existPicture){
         String dateFormated = GetDateNow.getOnlyYearAndMonth(incomeOrExpense.getDate());
         byte[] decodedBytes = Base64.getDecoder().decode(incomeOrExpense.getPicture());
         String directory = this.USER_PHOTOS_BASE_PATH + user.getUsername() + "/"+type+"/" + dateFormated +"/";
         Path path = Paths.get(directory);
         try {
+            if(existPicture != null){
+                Path currentProfilePicture = Paths.get(this.USER_FOLDERS_BASE_PATH + existPicture);
+                if (Files.exists(currentProfilePicture)) {
+                    Files.delete(currentProfilePicture);
+                }
+            }
             Files.createDirectories(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -279,8 +287,62 @@ public class FinancialServices {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return "/private/img/users" + user.getUsername() + "/" + type + "/" + dateFormated + "/" + filename;
+        return "/private/img/users/" + user.getUsername() + "/" + type + "/" + dateFormated + "/" + filename;
     }
 
 
+    public ResponseEntity<Map<String, String>> editExpense(IncomeOrExpense expense) {
+        Map<String, String> response = new HashMap<>();
+        User user = jwtInterceptor.getCurrentUser();
+        String finalPaht = "";
+        try {
+            Expense expenseToEdit = iExpenseRespository.findById(expense.getId()).orElse(null);
+            if (expenseToEdit != null && expenseToEdit.getUser().equals(user)) {
+                expenseToEdit.setAmount(expense.getAmount());
+                expenseToEdit.setDate((GetDateNow.formatDate(expense.getDate())));
+                expenseToEdit.setCategory(expense.getCategoryExpenses());
+                iExpenseRespository.save(expenseToEdit);
+                if (!expense.getPicture().isEmpty()) {
+                    finalPaht = this.createPicture(user, "expenses", expense, expenseToEdit.getPicture());
+                    expenseToEdit.setPicture(finalPaht);
+                }
+            }
+            response.put("message", "Registro guardado correctamente");
+            response.put("status", "200");
+            return ResponseEntity.ok().body(response);
+
+        } catch (Exception e) {
+            response.put("message", "Ah ocurrido un error al editar el registro");
+            response.put("status", "409");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    public ResponseEntity<Map<String, String>> editIncome(IncomeOrExpense income) {
+        Map<String, String> response = new HashMap<>();
+        User user = jwtInterceptor.getCurrentUser();
+        String finalPaht = "";
+        try {
+            Income incomeToEdit = iIncomeRepository.findById(income.getId()).orElse(null);
+            if (incomeToEdit.getUser().equals(user)) {
+                incomeToEdit.setAmount(income.getAmount());
+                incomeToEdit.setDate((GetDateNow.formatDate(income.getDate())));
+                incomeToEdit.setDescription(income.getDescription());
+                incomeToEdit.setCategory(income.getCategoryIncomes());
+                iIncomeRepository.save(incomeToEdit);
+                if (!income.getPicture().isEmpty()) {
+                    finalPaht = this.createPicture(user, "expenses", income, incomeToEdit.getPicture());
+                    incomeToEdit.setPicture(finalPaht);
+                }
+            }
+            response.put("message", "Registro guardado correctamente");
+            response.put("status", "200");
+            return ResponseEntity.ok().body(response);
+
+        } catch (Exception e) {
+            response.put("message", "Ah ocurrido un error al editar el registro");
+            response.put("status", "409");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }
