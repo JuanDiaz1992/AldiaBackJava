@@ -307,7 +307,7 @@ public ResponseEntity<Map<String, String>> editExpense(IncomeOrExpense expense) 
             }
             iExpenseRespository.save(expenseToEdit);
         }
-        response.put("message", "Registro guardado correctamente");
+        response.put("message", "Registro editado correctamente");
         response.put("status", "200");
         return ResponseEntity.ok().body(response);
 
@@ -335,7 +335,7 @@ public ResponseEntity<Map<String, String>> editExpense(IncomeOrExpense expense) 
                 }
                 iIncomeRepository.save(incomeToEdit);
             }
-            response.put("message", "Registro guardado correctamente");
+            response.put("message", "Registro editado correctamente");
             response.put("status", "200");
             return ResponseEntity.ok().body(response);
 
