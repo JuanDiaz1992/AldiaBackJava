@@ -44,8 +44,8 @@ import java.util.regex.Pattern;
 @Slf4j
 public class FinancialServices {
     private final IIncomeRepository iIncomeRepository;
-    private final IExpenseRespository iExpenseRespository;
     private final IIncomesCategoryRespository iIncomesCategoryRespository;
+    private final IExpenseRespository iExpenseRespository;
     private final IExpensesCategoryRespository iExpensesCategoryRespository;
     @Value("${user.photos.base.path}")
     private String USER_PHOTOS_BASE_PATH;
@@ -53,160 +53,6 @@ public class FinancialServices {
     private String USER_FOLDERS_BASE_PATH;
     @Autowired
     private JwtInterceptor jwtInterceptor;
-
-
-
-    //Incomes Services
-
-    public ResponseEntity<Page<Income>> getIncomesForMounthService(String date, Pageable pageable) {
-        User user = jwtInterceptor.getCurrentUser();
-        Page<Income> incomesPage = iIncomeRepository.findByUserIdAndYearMonthPageable(user.getIdUser(), date, pageable);
-
-        if (incomesPage.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(incomesPage);
-        }
-
-        return ResponseEntity.ok().body(incomesPage);
-    }
-
-    public ResponseEntity<List<Income>> getIncomesForYearService(String date) {
-        User user = jwtInterceptor.getCurrentUser();
-        List<Income> incomes = iIncomeRepository.findByUserIdAndYear(user.getIdUser(),date);
-        if (incomes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(incomes);
-        }
-        return ResponseEntity.ok().body(incomes);
-    }
-
-    public ResponseEntity<Map<String,String>> insertIncomesService(IncomeOrExpense incomeOrExpense){
-        Map<String,String>response = new HashMap<>();
-        try {
-            User user = jwtInterceptor.getCurrentUser();
-            String finalPaht = "";
-            if (!incomeOrExpense.getPicture().isEmpty()){
-                finalPaht = this.createPicture(user,"incomes",incomeOrExpense,null);
-            }
-            Income income = new Income().builder()
-                    .date(GetDateNow.formatDate(incomeOrExpense.getDate()))
-                    .amount(incomeOrExpense.getAmount())
-                    .description(incomeOrExpense.getDescription())
-                    .category(incomeOrExpense.getCategoryIncomes())
-                    .picture(finalPaht)
-                    .user(user)
-                    .is_planned(incomeOrExpense.getIs_planned())
-                    .build();
-            iIncomeRepository.save(income);
-            response.put("message","Registro guardado correctamente");
-            response.put("status","200");
-            return ResponseEntity.ok().body(response);
-        }catch (Exception e){
-            response.put("message","Ah ocurrido un error al guardar el registro");
-            response.put("status","409");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-        }
-    }
-
-    public ResponseEntity<Map<String,String>> deleteIncomeService(int incomeId){
-        User user = jwtInterceptor.getCurrentUser();
-        Map<String,String> response = new HashMap<>();
-        try {
-            Income income = iIncomeRepository.findById(incomeId).orElse(null);
-            if (income != null && income.getUser().equals(user)){
-                iIncomeRepository.delete(income);
-                response.put("message","Registro eliminado correctamente");
-                response.put("status","200");
-                return ResponseEntity.ok().body(response);
-            }else{
-                response.put("message","El elemento no existe");
-                response.put("status","409");
-                return ResponseEntity.badRequest().body(response);
-            }
-        }catch (Exception e){
-            response.put("message","Ah ocurrido un error al eliminar el registro");
-            response.put("status","409");
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
-
-    public ResponseEntity<List>getCategoryIncomesServices(){
-        List<CategoryIncomes> list = iIncomesCategoryRespository.findAll();
-        return ResponseEntity.ok().body(list);
-    }
-
-
-    //Expenses Services
-
-    public ResponseEntity<Map<String,String>> insertExpensesService(IncomeOrExpense incomeOrExpense) {
-        Map<String,String>response = new HashMap<>();
-        try {
-            User user = jwtInterceptor.getCurrentUser();
-            String finalPaht = "";
-            if (!incomeOrExpense.getPicture().isEmpty()){
-                finalPaht = this.createPicture(user,"expenses",incomeOrExpense, null);
-            }
-            Expense expense = new Expense().builder()
-                    .date(GetDateNow.formatDate(incomeOrExpense.getDate()))
-                    .amount(incomeOrExpense.getAmount())
-                    .description(incomeOrExpense.getDescription())
-                    .picture(finalPaht)
-                    .category(incomeOrExpense.getCategoryExpenses())
-                    .user(user)
-                    .is_planned(incomeOrExpense.getIs_planned())
-                    .build();
-            iExpenseRespository.save(expense);
-            response.put("message","Registro guardado correctamente");
-            response.put("status","200");
-            return ResponseEntity.ok().body(response);
-        }catch (Exception e){
-            response.put("message","Ah ocurrido un error al guardar el registro");
-            response.put("status","409");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-        }
-    }
-
-    public ResponseEntity<Page<Expense>> getExpensesForMounthService(String date,Pageable pageable){
-        User user = jwtInterceptor.getCurrentUser();
-        Page<Expense> expenses = iExpenseRespository.findByUserIdAndYearMonthPageable(user.getIdUser(),date, pageable);
-        if (expenses.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenses);
-        }
-        return ResponseEntity.ok().body(expenses);
-    }
-
-    public ResponseEntity<List<Expense>> getExpensesForYearService(String date) {
-        User user = jwtInterceptor.getCurrentUser();
-        List<Expense> expenses = iExpenseRespository.findByUserIdAndYear(user.getIdUser(),date);
-        if (expenses.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenses);
-        }
-        return ResponseEntity.ok().body(expenses);
-    }
-
-    public ResponseEntity<Map<String,String>> deleteExpenseService(int idExpense){
-        User user = jwtInterceptor.getCurrentUser();
-        Map<String,String> response = new HashMap<>();
-        try {
-            Expense expense = iExpenseRespository.findById(idExpense).orElse(null);
-            if (expense != null && expense.getUser().equals(user)){
-                iExpenseRespository.delete(expense);
-                response.put("message","Registro eliminado correctamente");
-                response.put("status","200");
-                return ResponseEntity.ok().body(response);
-            }
-            response.put("message","El elemento no existe");
-            response.put("status","409");
-            return ResponseEntity.badRequest().body(response);
-        }catch (Exception e){
-            response.put("message","Ah ocurrido un error al eliminar el registro");
-            response.put("status","409");
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
-
-    public ResponseEntity<List>getCategoryExpensesServices(){
-        List<CategoryExpenses> list = iExpensesCategoryRespository.findAll();
-        return ResponseEntity.ok().body(list);
-    }
 
     //Expenses and Incomes together
     public ResponseEntity<Map<String, Integer>> getIncomesAndExpensesAmount(String date){
@@ -290,59 +136,39 @@ public class FinancialServices {
         return "/private/img/users/" + user.getUsername() + "/" + type + "/" + dateFormated + "/" + filename;
     }
 
-public ResponseEntity<Map<String, String>> editExpense(IncomeOrExpense expense) {
-    Map<String, String> response = new HashMap<>();
-    User user = jwtInterceptor.getCurrentUser();
-    String finalPaht = "";
-    try {
-        Expense expenseToEdit = iExpenseRespository.findById(expense.getId()).orElse(null);
-        if (expenseToEdit.getUser().equals(user)) {
-            expenseToEdit.setAmount(expense.getAmount());
-            expenseToEdit.setDate((GetDateNow.formatDate(expense.getDate())));
-            expenseToEdit.setDescription(expense.getDescription());
-            expenseToEdit.setCategory(expense.getCategoryExpenses());
-            if (!expense.getPicture().isEmpty()) {
-                finalPaht = this.createPicture(user, "expenses", expense, expenseToEdit.getPicture());
-                expenseToEdit.setPicture(finalPaht);
-            }
-            iExpenseRespository.save(expenseToEdit);
-        }
-        response.put("message", "Registro editado correctamente");
-        response.put("status", "200");
-        return ResponseEntity.ok().body(response);
 
-    } catch (Exception e) {
-        response.put("message", "Ah ocurrido un error al editar el registro");
-        response.put("status", "409");
-        return ResponseEntity.badRequest().body(response);
-    }
-}
-
-    public ResponseEntity<Map<String, String>> editIncome(IncomeOrExpense income) {
-        Map<String, String> response = new HashMap<>();
+    public ResponseEntity<Map<String,Integer>> getBalanceService(String date) {
+        String year = date.substring(0,4);
+        String mount = date.substring(0,7);
         User user = jwtInterceptor.getCurrentUser();
-        String finalPaht = "";
+        Map <String,Integer> response = new HashMap<>();
         try {
-            Income incomeToEdit = iIncomeRepository.findById(income.getId()).orElse(null);
-            if (incomeToEdit.getUser().equals(user)) {
-                incomeToEdit.setAmount(income.getAmount());
-                incomeToEdit.setDate((GetDateNow.formatDate(income.getDate())));
-                incomeToEdit.setDescription(income.getDescription());
-                incomeToEdit.setCategory(income.getCategoryIncomes());
-                if (!income.getPicture().isEmpty()) {
-                    finalPaht = this.createPicture(user, "incomes", income, incomeToEdit.getPicture());
-                    incomeToEdit.setPicture(finalPaht);
-                }
-                iIncomeRepository.save(incomeToEdit);
-            }
-            response.put("message", "Registro editado correctamente");
-            response.put("status", "200");
+            List<Expense> expensesForMonth = iExpenseRespository.findByUserIdAndYearMonth(user.getIdUser(),mount);
+            List<Income> incomesForMonth = iIncomeRepository.findByUserIdAndYearMonth(user.getIdUser(), mount);
+            List<Expense> expensesForYear = iExpenseRespository.findByUserIdAndYear(user.getIdUser(),year);
+            List<Income> incomesForYear = iIncomeRepository.findByUserIdAndYear(user.getIdUser(), year);
+            int totalIncomesForMonth = FinancialServices.sumNumbers(incomesForMonth,null);
+            int totalIncomesForYear = FinancialServices.sumNumbers(incomesForYear,null);
+            int totalExpenseForMonth = FinancialServices.sumNumbers(null,expensesForMonth);
+            int totalExpensesForYear = FinancialServices.sumNumbers(null,expensesForYear);
+            int totalBalanceForMonth = totalIncomesForMonth - totalExpenseForMonth;
+            int totalBalanceForYear = totalIncomesForYear - totalExpensesForYear;
+            response.put("balanceYear",totalBalanceForYear);
+            response.put("balanceMounth",totalBalanceForMonth);
             return ResponseEntity.ok().body(response);
-
         } catch (Exception e) {
-            response.put("message", "Ah ocurrido un error al editar el registro");
-            response.put("status", "409");
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(null);
         }
+
+    }
+    static public int sumNumbers(List<Income> incomes, List<Expense> expenses){
+        AtomicInteger totalCash = new AtomicInteger(0);
+        if (expenses != null && !expenses.isEmpty()) {
+            expenses.forEach(expense -> totalCash.addAndGet(expense.getAmount()));
+        }
+        if (incomes != null && !incomes.isEmpty()) {
+            incomes.forEach(income -> totalCash.addAndGet(income.getAmount()));
+        }
+        return totalCash.get();
     }
 }
