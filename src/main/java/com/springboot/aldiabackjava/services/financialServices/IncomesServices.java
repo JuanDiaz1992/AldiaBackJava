@@ -37,12 +37,12 @@ public class IncomesServices {
     private JwtInterceptor jwtInterceptor;
 
 
+
     //Incomes Services
 
     public ResponseEntity<Page<Income>> getIncomesForMounthService(String date, Pageable pageable) {
         User user = jwtInterceptor.getCurrentUser();
         Page<Income> incomesPage = iIncomeRepository.findByUserIdAndYearMonthPageable(user.getIdUser(), date, pageable);
-
         if (incomesPage.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(incomesPage);
         }
@@ -60,9 +60,9 @@ public class IncomesServices {
     }
 
     public ResponseEntity<Map<String,String>> insertIncomesService(IncomeOrExpense incomeOrExpense){
+        User user = jwtInterceptor.getCurrentUser();
         Map<String,String>response = new HashMap<>();
         try {
-            User user = jwtInterceptor.getCurrentUser();
             String finalPaht = "";
             if (!incomeOrExpense.getPicture().isEmpty()){
                 finalPaht = financialServices.createPicture(user,"incomes",incomeOrExpense,null);
@@ -115,8 +115,8 @@ public class IncomesServices {
     }
 
     public ResponseEntity<Map<String, String>> editIncome(IncomeOrExpense income) {
-        Map<String, String> response = new HashMap<>();
         User user = jwtInterceptor.getCurrentUser();
+        Map<String, String> response = new HashMap<>();
         String finalPaht = "";
         try {
             Income incomeToEdit = iIncomeRepository.findById(income.getId()).orElse(null);
