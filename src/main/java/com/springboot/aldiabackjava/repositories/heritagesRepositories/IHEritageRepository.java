@@ -12,4 +12,5 @@ import java.util.List;
 public interface IHEritageRepository extends JpaRepository<Heritages, Integer> {
     @Query("SELECT h FROM Heritages h WHERE h.user.idUser = :id_user")
     Page<Heritages> findByUserIdPageable(@Param("id_user") int idUser, Pageable pageable);
+    List<Heritages> findByUserIdUser(int idUser);
 }

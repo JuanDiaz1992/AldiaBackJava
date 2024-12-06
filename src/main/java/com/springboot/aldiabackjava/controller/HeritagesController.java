@@ -21,7 +21,7 @@ public class HeritagesController {
     HeritageServices heritageServices;
 
     @PostMapping("/saveheritage")
-    public ResponseEntity<Map<String,String>> insertExpenses(@RequestBody BasicHeritage basicHeritage){
+    public ResponseEntity<Map<String,String>> saveHeritage(@RequestBody BasicHeritage basicHeritage){
         return heritageServices.createHeritage(basicHeritage);
     }
 
@@ -29,4 +29,21 @@ public class HeritagesController {
     public ResponseEntity<Page<Heritages>> getHeritages(Pageable pageable){
         return heritageServices.getHeritages(pageable);
     }
+
+    @DeleteMapping("/deleteheritage/id/{id}")
+    public ResponseEntity<Map<String,String>> delteheritage(@PathVariable("id") int id){
+        return heritageServices.deleteHeritage(id);
+    }
+
+    @PutMapping("/editHeritage")
+    public ResponseEntity<Map<String,String>>editHeritage(@RequestBody BasicHeritage basicHeritage){
+        return heritageServices.editHeritage(basicHeritage);
+    }
+
+    @GetMapping("/gettotalheritages")
+    public ResponseEntity<Map<String,String>>getTotalHeritages(){
+        log.info("here");
+        return heritageServices.getTotalheritagesService();
+    }
 }
+

@@ -16,6 +16,7 @@ import java.sql.Date;
 
 public class BasicHeritage {
     @JsonFormat(pattern = "yyyy-MM-dd")
+    int id = 0;
     int idUser;
     private int currenValue;
     private int acquisitionValue;

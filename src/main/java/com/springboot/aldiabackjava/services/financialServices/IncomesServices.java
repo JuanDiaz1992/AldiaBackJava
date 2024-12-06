@@ -80,6 +80,7 @@ public class IncomesServices {
             response.put("message","Registro guardado correctamente");
             response.put("status","200");
             return ResponseEntity.ok().body(response);
+
         }catch (Exception e){
             response.put("message","Ah ocurrido un error al guardar el registro");
             response.put("status","409");
@@ -130,10 +131,13 @@ public class IncomesServices {
                     incomeToEdit.setPicture(finalPaht);
                 }
                 iIncomeRepository.save(incomeToEdit);
+                response.put("message", "Registro editado correctamente");
+                response.put("status", "200");
+                return ResponseEntity.ok().body(response);
             }
-            response.put("message", "Registro editado correctamente");
-            response.put("status", "200");
-            return ResponseEntity.ok().body(response);
+            response.put("message", "Ah ocurrido un error al editar el registro");
+            response.put("status", "409");
+            return ResponseEntity.badRequest().body(response);
 
         } catch (Exception e) {
             response.put("message", "Ah ocurrido un error al editar el registro");

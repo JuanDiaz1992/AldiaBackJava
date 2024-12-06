@@ -65,4 +65,78 @@ public class HeritageServices {
         return ResponseEntity.ok().body(heritagePage);
     }
 
+    public ResponseEntity<Map<String, String>> deleteHeritage(int id) {
+        Map <String,String>response = new HashMap<>();
+        User user = jwtInterceptor.getCurrentUser();
+        try{
+            Heritages heritage = ihEritageRepository.findById(id).orElse(null);
+            if (heritage!=null && heritage.getUser().equals(user)){
+                ihEritageRepository.delete(heritage);
+                response.put("message","Registro eliminado correctamente");
+                response.put("status","200");
+                return ResponseEntity.ok().body(response);
+            }else{
+                response.put("message","Error al eliminar el registro");
+                response.put("status","409");
+                return ResponseEntity.badRequest().body(response);
+            }
+        }catch (Exception e){
+            response.put("message","Error al eliminar el registro");
+            response.put("status","409");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+
+    }
+
+    public ResponseEntity<Map<String,String>>editHeritage(BasicHeritage heritage){
+        Map <String,String>response = new HashMap<>();
+        User user = jwtInterceptor.getCurrentUser();
+        try{
+            Heritages heritageToEdit = ihEritageRepository.findById(heritage.getId()).orElse(null);
+            if(heritageToEdit.getUser().equals(user) && heritageToEdit!=null){
+                heritageToEdit.setTypeHeritages(heritage.getTypeHeritages());
+                heritageToEdit.setDescription(heritage.getDescription());
+                heritageToEdit.setAcquisitionDate(heritage.getAcquisitionDate());
+                heritageToEdit.setCurrenValue(heritage.getCurrenValue());
+                heritageToEdit.setAcquisitionValue(heritage.getAcquisitionValue());
+                ihEritageRepository.save(heritageToEdit);
+                response.put("message", "Registro editado correctamente");
+                response.put("status", "200");
+                return ResponseEntity.ok().body(response);
+            }else{
+                response.put("message", "Ah ocurrido un error al editar el registro");
+                response.put("status", "409");
+                return ResponseEntity.badRequest().body(response);
+            }
+        }catch (Exception e){
+            response.put("message", "Ah ocurrido un error al editar el registro");
+            response.put("status", "409");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    public ResponseEntity<Map<String,String>> getTotalheritagesService() {
+        Map<String,String> response = new HashMap<>();
+        User user = jwtInterceptor.getCurrentUser();
+        try{
+            List<Heritages> heritages = ihEritageRepository.findByUserIdUser(user.getIdUser());
+            Integer total = 0;
+            if (!heritages.isEmpty()){
+                for(Heritages heritage:heritages){
+                    total += heritage.getCurrenValue();
+                }
+                response.put("total",total.toString());
+                response.put("status", "200");
+                return ResponseEntity.ok().body(response);
+            }
+            response.put("message", "No hay registro de patrimonios");
+            response.put("status", "409");
+            return ResponseEntity.badRequest().body(response);
+        }catch (NullPointerException e){
+            response.put("message", "No hay registro de patrimonios");
+            response.put("status", "409");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }
