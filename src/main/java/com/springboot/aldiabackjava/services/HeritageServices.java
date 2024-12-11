@@ -116,27 +116,34 @@ public class HeritageServices {
         }
     }
 
-    public ResponseEntity<Map<String,String>> getTotalheritagesService() {
-        Map<String,String> response = new HashMap<>();
+    public ResponseEntity<Map<String, String>> getTotalheritagesService() {
+        Map<String, String> response = new HashMap<>();
         User user = jwtInterceptor.getCurrentUser();
-        try{
+        Integer total = 0;
+
+        try {
             List<Heritages> heritages = ihEritageRepository.findByUserIdUser(user.getIdUser());
-            Integer total = 0;
-            if (!heritages.isEmpty()){
-                for(Heritages heritage:heritages){
-                    total += heritage.getCurrenValue();
-                }
-                response.put("total",total.toString());
-                response.put("status", "200");
-                return ResponseEntity.ok().body(response);
+            if (heritages == null || heritages.isEmpty()) {
+                response.put("total", total.toString());
+                response.put("message", "No hay registro de patrimonios");
+                response.put("status", "409");
+                return ResponseEntity.status(409).body(response); // Cambiar al código correcto.
             }
-            response.put("message", "No hay registro de patrimonios");
-            response.put("status", "409");
-            return ResponseEntity.badRequest().body(response);
-        }catch (NullPointerException e){
-            response.put("message", "No hay registro de patrimonios");
-            response.put("status", "409");
-            return ResponseEntity.badRequest().body(response);
+
+            for (Heritages heritage : heritages) {
+                total += heritage.getCurrenValue();
+            }
+
+            response.put("total", total.toString());
+            response.put("status", "200");
+            return ResponseEntity.ok().body(response);
+
+        } catch (Exception e) { // Captura todas las excepciones inesperadas.
+            response.put("total", total.toString());
+            response.put("message", "Ocurrió un error inesperado");
+            response.put("status", "500");
+            return ResponseEntity.status(500).body(response);
         }
     }
+
 }

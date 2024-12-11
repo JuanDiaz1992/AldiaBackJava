@@ -42,7 +42,6 @@ public class HeritagesController {
 
     @GetMapping("/gettotalheritages")
     public ResponseEntity<Map<String,String>>getTotalHeritages(){
-        log.info("here");
         return heritageServices.getTotalheritagesService();
     }
 }
