@@ -35,10 +35,6 @@ public class PublicController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
-    @PostMapping("/validate")
-    public ResponseEntity<Map<String,String>> validateUserAndEmail(@RequestBody RegisterRequest request ){
-        return publicServices.validateUserAndEmailService(request);
-    }
     @PostMapping("/register")
     public ResponseEntity<Map<String,String>> register(@RequestBody RegisterRequest request){
         return publicServices.registerUserService(request);

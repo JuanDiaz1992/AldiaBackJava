@@ -15,8 +15,7 @@ public class RegisterRequest {
     private String username;
     private String password;
     private String confirmPassword;
-    private String firstName;
-    private String middleName;
+    private String name;
     private String lastName;
     private String surnamen;
     private TypeDocument typeDocument;
@@ -32,4 +31,5 @@ public class RegisterRequest {
     private String occupation;
     private Boolean dataTreatment;
     private int exogenous;
+
 }

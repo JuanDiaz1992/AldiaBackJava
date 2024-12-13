@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface IProfileRepository extends CrudRepository<Profile, Integer> {
-    Optional<Profile> findByEmail(String email);
     Optional<Profile> findByDocument(String document);
 }

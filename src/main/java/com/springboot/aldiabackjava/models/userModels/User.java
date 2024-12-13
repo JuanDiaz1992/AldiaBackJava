@@ -19,17 +19,19 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_user")
     private int idUser;
+    @Column(nullable = true)
     private String username;
     @JsonIgnore
     private String password;
     @Column(name="role")
     private Rol rol;
+    private String email;
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_profile", referencedColumnName = "id_profile")
     private Profile profile;

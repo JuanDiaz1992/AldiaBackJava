@@ -8,16 +8,14 @@ import lombok.Data;
 @Data
 @Builder
 @Entity
-@Table(name="profiles", uniqueConstraints = {@UniqueConstraint(columnNames = {"document","email"})})
+@Table(name="profiles", uniqueConstraints = {@UniqueConstraint(columnNames = {"document"})})
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_profile")
     private int idPRofile;
-    @Column(name="first_name")
-    private String firstName;
-    @Column(name="middle_name",nullable = true)
-    private String middleName;
+    @Column(name="name")
+    private String name;
     @Column(name="last_name")
     private String lastName;
     @Column(name="surname",nullable = true)
@@ -35,16 +33,14 @@ public class Profile {
     private CivilStatus civilStatus;
     @Column(name="number_phone")
     private String numberPhone;
-    private String email;
     private String occupation;
     @Column(name="data_treatment")
     private Boolean dataTreatment;
     private int exogenous;
 
-    public Profile(int idPRofile, String firstName, String middleName, String lastName, String surnamen, TypeDocument typeDocument, String document, String profilePicture, String birthDate, String department, String town, String address, CivilStatus civilStatus, String numberPhone, String email, String occupation, Boolean dataTreatment, int exogenous) {
+    public Profile(int idPRofile, String name, String lastName, String surnamen, TypeDocument typeDocument, String document, String profilePicture, String birthDate, String department, String town, String address, CivilStatus civilStatus, String numberPhone, String occupation, Boolean dataTreatment, int exogenous) {
         this.idPRofile = idPRofile;
-        this.firstName = firstName;
-        this.middleName = middleName;
+        this.name = name;
         this.lastName = lastName;
         this.surnamen = surnamen;
         this.typeDocument = typeDocument;
@@ -56,15 +52,13 @@ public class Profile {
         this.address = address;
         this.civilStatus = civilStatus;
         this.numberPhone = numberPhone;
-        this.email = email;
         this.occupation = occupation;
         this.dataTreatment = dataTreatment;
         this.exogenous = exogenous;
     }
 
-    public Profile(String firstName, String middleName, String lastName, String surnamen, TypeDocument typeDocument, String document, String profilePicture, String birthDate, String department, String town, String address, CivilStatus civilStatus, String numberPhone, String email, String occupation, Boolean dataTreatment, int exogenous) {
-        this.firstName = firstName;
-        this.middleName = middleName;
+    public Profile(String firstName, String name, String surnamen, TypeDocument typeDocument, String document, String profilePicture, String birthDate, String department, String town, String address, CivilStatus civilStatus, String numberPhone, String email, String occupation, Boolean dataTreatment, int exogenous) {
+        this.name = name;
         this.lastName = lastName;
         this.surnamen = surnamen;
         this.typeDocument = typeDocument;
@@ -76,7 +70,6 @@ public class Profile {
         this.address = address;
         this.civilStatus = civilStatus;
         this.numberPhone = numberPhone;
-        this.email = email;
         this.occupation = occupation;
         this.dataTreatment = dataTreatment;
         this.exogenous = exogenous;

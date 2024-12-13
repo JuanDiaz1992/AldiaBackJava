@@ -61,8 +61,7 @@ public class AuthService {
         User user = null;
         user = jwtInterceptor.getCurrentUser();
         Profile profile = user.getProfile();
-        profile.setFirstName(userUpdate.getFirstName() != null && !userUpdate.getFirstName().isEmpty() ? userUpdate.getFirstName() : profile.getFirstName());
-        profile.setMiddleName(userUpdate.getMiddleName() != null && !userUpdate.getMiddleName().isEmpty() ? userUpdate.getMiddleName() : profile.getMiddleName());
+        profile.setName(userUpdate.getName() != null && !userUpdate.getName().isEmpty() ? userUpdate.getName() : profile.getName());
         profile.setLastName(userUpdate.getLastName() != null && !userUpdate.getLastName().isEmpty() ? userUpdate.getLastName() : profile.getLastName());
         profile.setSurnamen(userUpdate.getSurnamen() != null && !userUpdate.getSurnamen().isEmpty() ? userUpdate.getSurnamen() : profile.getSurnamen());
         profile.setTypeDocument(userUpdate.getTypeDocument() != null ? userUpdate.getTypeDocument() : profile.getTypeDocument());
@@ -74,7 +73,6 @@ public class AuthService {
         profile.setAddress(userUpdate.getAddress() != null && !userUpdate.getAddress().isEmpty() ? userUpdate.getAddress() : profile.getAddress());
         profile.setCivilStatus(userUpdate.getCivilStatus() != null? userUpdate.getCivilStatus() : profile.getCivilStatus());
         profile.setNumberPhone(userUpdate.getNumberPhone() != null && !userUpdate.getNumberPhone().isEmpty() ? userUpdate.getNumberPhone() : profile.getNumberPhone());
-        profile.setEmail(userUpdate.getEmail() != null && !userUpdate.getEmail().isEmpty() ? userUpdate.getEmail() : profile.getEmail());
         profile.setOccupation(userUpdate.getOccupation() != null && !userUpdate.getOccupation().isEmpty() ? userUpdate.getOccupation() : profile.getOccupation());
         iProfileRepository.save(profile);
         return user;
