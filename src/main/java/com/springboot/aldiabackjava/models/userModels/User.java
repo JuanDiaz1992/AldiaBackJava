@@ -28,6 +28,7 @@ public class User implements UserDetails {
     @Column(nullable = true)
     private String username;
     @JsonIgnore
+    @Column(nullable = true)
     private String password;
     @Column(name="role")
     private Rol rol;
@@ -35,6 +36,7 @@ public class User implements UserDetails {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_profile", referencedColumnName = "id_profile")
     private Profile profile;
+    private boolean isFromExternalApp;
 
 
     @Override

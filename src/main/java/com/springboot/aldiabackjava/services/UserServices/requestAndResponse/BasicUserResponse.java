@@ -19,4 +19,5 @@ public class BasicUserResponse {
     private String rol;
     private String photo;
     private String occupation;
+    private boolean isFromExternalApp;
 }

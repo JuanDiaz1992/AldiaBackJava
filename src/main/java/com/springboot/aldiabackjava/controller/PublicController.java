@@ -39,4 +39,13 @@ public class PublicController {
     public ResponseEntity<Map<String,String>> register(@RequestBody RegisterRequest request){
         return publicServices.registerUserService(request);
     }
+
+    @PostMapping("/google")
+    public ResponseEntity<BasicUserResponse> loginUserWhitGoogle(@RequestBody Map<String,Object> request){
+        BasicUserResponse result =  publicServices.loginGoogleService(request);
+        if (result != null){
+            return ResponseEntity.ok(result);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    }
 }
