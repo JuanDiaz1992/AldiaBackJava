@@ -31,5 +31,6 @@ public class RegisterRequest {
     private String occupation;
     private Boolean dataTreatment;
     private int exogenous;
+    private String confirmCode;
 
 }

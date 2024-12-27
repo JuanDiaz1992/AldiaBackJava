@@ -1,9 +1,6 @@
 package com.springboot.aldiabackjava.services.financialServices;
 
-
 import com.springboot.aldiabackjava.config.JwtInterceptor;
-import com.springboot.aldiabackjava.models.expensesAndIncomesModels.CategoryExpenses;
-import com.springboot.aldiabackjava.models.expensesAndIncomesModels.CategoryIncomes;
 import com.springboot.aldiabackjava.models.expensesAndIncomesModels.Expense;
 import com.springboot.aldiabackjava.models.expensesAndIncomesModels.Income;
 import com.springboot.aldiabackjava.models.userModels.User;
@@ -15,29 +12,16 @@ import com.springboot.aldiabackjava.services.financialServices.requestAndRespons
 import com.springboot.aldiabackjava.utils.GetDateNow;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sourceforge.tess4j.Tesseract;
-import net.sourceforge.tess4j.TesseractException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Date;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor

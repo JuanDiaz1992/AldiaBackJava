@@ -40,6 +40,11 @@ public class PublicController {
         return publicServices.registerUserService(request);
     }
 
+    @PostMapping("/emailvalidate")
+    public ResponseEntity<Map<String,String>> validateEmmail(@RequestBody RegisterRequest request){
+        return publicServices.validateMail(request);
+    }
+
     @PostMapping("/google")
     public ResponseEntity<BasicUserResponse> loginUserWhitGoogle(@RequestBody Map<String,Object> request){
         BasicUserResponse result =  publicServices.loginGoogleService(request);
