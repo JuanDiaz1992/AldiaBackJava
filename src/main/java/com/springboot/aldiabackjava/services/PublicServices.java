@@ -32,6 +32,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class PublicServices {
+    @Autowired
     private final EmailSender emailSender;
 
     @Autowired
@@ -123,12 +124,10 @@ public class PublicServices {
     }
 
     public BasicUserResponse loginGoogleService(Map<String,Object> request) {
-        log.info(request.toString());
         Map<String,Object>dataUser = (Map<String, Object>) request.get("response");
         String idToken = (String) dataUser.get("credential");
         try {
             Map<String, Object> userData = GoogleTokenValidator.getUserDataFromToken(idToken);
-            log.info(userData.toString());
             if (!userData.isEmpty()){
                 String email = (String) userData.get("email");
                 User user = iUserRepository.findByEmail(email).orElse(null);

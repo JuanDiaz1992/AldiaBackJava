@@ -8,13 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.util.Properties;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 @Service
 public class EmailSender {
+
     private final String username;
     private final String password;
-
+    @Autowired
     public EmailSender(@Value("${mail}") String username,
                        @Value("${passwordmail}") String password) {
         this.username = username;
@@ -30,6 +32,7 @@ public class EmailSender {
                     Message.RecipientType.TO,
                     InternetAddress.parse(mailTo)
             );
+            msg.setFrom(username);
             msg.setSubject("Verifica tu Correo Electrónico");
             msg.setContent(
                     "<h1>¡Hola!</h1>" +
