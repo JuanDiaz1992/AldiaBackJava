@@ -23,7 +23,7 @@ public class EmailSender {
         this.password = password;
     }
 
-    public void senMail(String mailTo, String code)  {
+    public void senMail(String mailTo, String subjetct, String message)  {
         Session session = setupJavaxSession(username, password);
         try {
             MimeMessage msg = new MimeMessage(session);
@@ -33,13 +33,8 @@ public class EmailSender {
                     InternetAddress.parse(mailTo)
             );
             msg.setFrom(username);
-            msg.setSubject("Verifica tu Correo Electrónico");
-            msg.setContent(
-                    "<h1>¡Hola!</h1>" +
-                            "<p>Gracias por registrarte. Por favor, usa el siguiente código para verificar tu correo electrónico:</p>" +
-                            "<h2 style='color: #2e6c80;'>" + code + "</h2>" +
-                            "<p>Si no solicitaste este código, ignora este correo.</p>"
-                    ,"text/html");
+            msg.setSubject(subjetct);
+            msg.setContent(message,"text/html");
             Transport.send(msg);
         } catch (MessagingException e) {
             throw new RuntimeException(e);

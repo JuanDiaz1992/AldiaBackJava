@@ -1,9 +1,7 @@
 package com.springboot.aldiabackjava.services.UserServices;
 
 
-import com.springboot.aldiabackjava.JWT.JwtTokenService;
 import com.springboot.aldiabackjava.config.JwtInterceptor;
-import com.springboot.aldiabackjava.utils.DataValidate;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
 import com.springboot.aldiabackjava.models.userModels.Profile;
 import com.springboot.aldiabackjava.models.userModels.User;
@@ -17,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,16 +36,14 @@ public class AuthService {
     private JwtInterceptor jwtInterceptor;
     @Autowired
     private DataValidate dataValidate;
-
+    @Autowired
     private final IUserRepository iUserRepository;
+    @Autowired
     private final IProfileRepository iProfileRepository;
-    private final JwtTokenService jwtTokenService;
+    @Autowired
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-
     @Value("${user.photos.base.path}")
     private String USER_PHOTOS_BASE_PATH;
-
     @Value("${user.folders.base.path}")
     private String USER_FOLDERS_BASE_PATH;
 

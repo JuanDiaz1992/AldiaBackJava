@@ -1,4 +1,4 @@
-package com.springboot.aldiabackjava.utils;
+package com.springboot.aldiabackjava.services.UserServices;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

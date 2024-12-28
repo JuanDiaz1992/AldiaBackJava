@@ -1,20 +1,21 @@
 package com.springboot.aldiabackjava.controller;
 
 
-import com.springboot.aldiabackjava.services.PublicServices;
+import com.springboot.aldiabackjava.services.UserServices.publicServices.GoogleService;
+import com.springboot.aldiabackjava.services.UserServices.publicServices.LoginService;
+import com.springboot.aldiabackjava.services.UserServices.publicServices.RegisterService;
+import com.springboot.aldiabackjava.services.UserServices.publicServices.RestorePasswordService;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.BasicUserResponse;
+import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.ChangePasswordRequest;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.LoginRequest;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
-import com.springboot.aldiabackjava.services.UserServices.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -23,12 +24,18 @@ import java.util.Map;
 @Slf4j
 public class PublicController {
     @Autowired
-    private PublicServices publicServices;
+    private LoginService loginService;
+    @Autowired
+    private RegisterService registerService;
+    @Autowired
+    private GoogleService googleService;
+    @Autowired
+    private RestorePasswordService restorePasswordService;
 
 
     @PostMapping("/login")
     public ResponseEntity<BasicUserResponse> loginUser(@RequestBody LoginRequest request){
-        BasicUserResponse result = publicServices.loginUserService(request);
+        BasicUserResponse result = loginService.loginUserService(request);
         if (result != null){
             return ResponseEntity.ok(result);
         }
@@ -37,20 +44,25 @@ public class PublicController {
 
     @PostMapping("/register")
     public ResponseEntity<Map<String,String>> register(@RequestBody RegisterRequest request){
-        return publicServices.registerUserService(request);
+        return registerService.registerUserService(request);
     }
 
     @PostMapping("/emailvalidate")
     public ResponseEntity<Map<String,String>> validateEmmail(@RequestBody RegisterRequest request){
-        return publicServices.validateMail(request);
+        return registerService.validateMail(request);
     }
 
     @PostMapping("/google")
     public ResponseEntity<BasicUserResponse> loginUserWhitGoogle(@RequestBody Map<String,Object> request){
-        BasicUserResponse result =  publicServices.loginGoogleService(request);
+        BasicUserResponse result =  googleService.loginGoogleService(request);
         if (result != null){
             return ResponseEntity.ok(result);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    }
+
+    @PostMapping("/restorepassword")
+    public ResponseEntity<Map<String,String>> restorePassword(@RequestBody ChangePasswordRequest request){
+        return restorePasswordService.restorePassword(request);
     }
 }
