@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface IPasswordRestoreToken  extends JpaRepository<PasswordRestoreToken,String> {
     Optional<PasswordRestoreToken> findByUser(User user);
+    Optional<PasswordRestoreToken> findByToken(String token);
 }

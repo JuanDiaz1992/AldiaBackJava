@@ -1,6 +1,7 @@
 package com.springboot.aldiabackjava.services.UserServices.publicServices;
 
 
+import com.springboot.aldiabackjava.models.userModels.EmailVerification;
 import com.springboot.aldiabackjava.models.userModels.PasswordRestoreToken;
 import com.springboot.aldiabackjava.models.userModels.User;
 import com.springboot.aldiabackjava.repositories.userRepositories.IPasswordRestoreToken;
@@ -8,19 +9,21 @@ import com.springboot.aldiabackjava.repositories.userRepositories.IUserRepositor
 import com.springboot.aldiabackjava.services.EmailSender;
 import com.springboot.aldiabackjava.services.UserServices.DataValidate;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.ChangePasswordRequest;
+import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.ResetPasswordRequest;
 import com.springboot.aldiabackjava.utils.CodeGenerator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class RestorePasswordService {
     @Autowired
     public IPasswordRestoreToken iPasswordRestoreToken;
@@ -30,12 +33,12 @@ public class RestorePasswordService {
     private DataValidate dataValidate;
     @Autowired
     private EmailSender emailSender;
-    @Value("${host.front}")
-    private String frontHost;
+    @Autowired
+    private final PasswordEncoder passwordEncoder;
 
 
 
-    public ResponseEntity<Map<String,String>> restorePassword(ChangePasswordRequest request){
+    public ResponseEntity<Map<String,String>> restorePassword(ResetPasswordRequest request){
         Map<String,String> response = new HashMap<>();
         String emailValidate = dataValidate.validateEmail(request.getEmail());
         if (emailValidate != null){
@@ -49,9 +52,14 @@ public class RestorePasswordService {
             response.put("status","409");
             return ResponseEntity.badRequest().body(response);
         }
+        if (user.isFromExternalApp()){
+            response.put("message","No es posible cambiar la contraseña para usuarios registrados con Google. Por favor, inicia sesión utilizando el botón de Google.");
+            response.put("status","403");
+            return ResponseEntity.badRequest().body(response);
+        }
         this.deletePasswordRestoreToken(user);
-        String token = CodeGenerator.generateNumericCode(8);
-        String linkrestore = frontHost+"reset-password/"+token;
+        String token = CodeGenerator.generateAlphaNumericCode(20);
+        String linkrestore = request.getHost()+"reset-password/"+token;
         String subjetct = "Verifica tu Correo Electrónico";
         String message =
                         "<h1>¡Hola!</h1>" +
@@ -67,7 +75,7 @@ public class RestorePasswordService {
                 return ResponseEntity.ok().body(response);
             }
             response.put("message","Ah ocurrido un error, por favor intentalo más tarde.");
-            response.put("status","409");
+            response.put("status","500");
             return ResponseEntity.ok().body(response);
 
         }catch (Exception e){
@@ -81,7 +89,7 @@ public class RestorePasswordService {
         try{
             LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(10);
             PasswordRestoreToken passwordRestoreToken = PasswordRestoreToken.builder()
-                    .code(token)
+                    .token(token)
                     .expirationTime(expirationTime)
                     .user(user)
                     .build();
@@ -99,4 +107,40 @@ public class RestorePasswordService {
             iPasswordRestoreToken.delete(passwordRestoreToken);
         }
     }
+
+    public ResponseEntity<Map<String,String>> changePassword(ChangePasswordRequest request){
+        Map<String,String> response = new HashMap<>();
+        User user = validateCode(request.getToken());
+        if(user==null){
+            response.put("message","Ah ocurrido un error, por favor intentalo más tarde");
+            response.put("status","500");
+            return ResponseEntity.badRequest().body(response);
+        }
+        String morValidations = dataValidate.validatePassword(request.getNewPassword());
+        if (morValidations != null){
+            response.put("message","Contraseña invalida, por favor intente con otra");
+            response.put("status","409");
+            return ResponseEntity.badRequest().body(response);
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        iUserRepository.save(user);
+        response.put("message","La contraseña se cambió correctamente");
+        response.put("status","200");
+        return ResponseEntity.ok().body(response);
+    }
+
+    public User validateCode(String token) {
+        PasswordRestoreToken passwordRestoreToken= iPasswordRestoreToken.findByToken(token).orElse(null);
+        if (passwordRestoreToken != null) {
+            if (LocalDateTime.now().isBefore(passwordRestoreToken.getExpirationTime())) {
+                User user = passwordRestoreToken.getUser();
+                iPasswordRestoreToken.delete(passwordRestoreToken);
+                return user;
+            }
+        }
+        return null;
+    }
 }
+
+
+

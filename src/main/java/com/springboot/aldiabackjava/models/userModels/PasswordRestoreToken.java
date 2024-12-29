@@ -24,7 +24,7 @@ public class PasswordRestoreToken {
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     private User user;
     @Column(nullable = false)
-    private String code;
+    private String token;
     @Column(nullable = false)
     private LocalDateTime expirationTime;
 }

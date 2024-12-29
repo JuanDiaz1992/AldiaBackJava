@@ -1,4 +1,5 @@
 package com.springboot.aldiabackjava.utils;
+import java.util.UUID;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -10,5 +11,9 @@ public class CodeGenerator {
             code.append(digit);
         }
         return code.toString();
+    }
+
+    public static String generateAlphaNumericCode(int length){
+        return UUID.randomUUID().toString().replace("-", "").substring(0, length);
     }
 }

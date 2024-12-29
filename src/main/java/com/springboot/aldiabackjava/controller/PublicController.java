@@ -5,10 +5,7 @@ import com.springboot.aldiabackjava.services.UserServices.publicServices.GoogleS
 import com.springboot.aldiabackjava.services.UserServices.publicServices.LoginService;
 import com.springboot.aldiabackjava.services.UserServices.publicServices.RegisterService;
 import com.springboot.aldiabackjava.services.UserServices.publicServices.RestorePasswordService;
-import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.BasicUserResponse;
-import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.ChangePasswordRequest;
-import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.LoginRequest;
-import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
+import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +59,12 @@ public class PublicController {
     }
 
     @PostMapping("/restorepassword")
-    public ResponseEntity<Map<String,String>> restorePassword(@RequestBody ChangePasswordRequest request){
+    public ResponseEntity<Map<String,String>> restorePassword(@RequestBody ResetPasswordRequest request){
         return restorePasswordService.restorePassword(request);
+    }
+
+    @PostMapping("/resetpassword")
+    public ResponseEntity<Map<String,String>> resetPassword(@RequestBody ChangePasswordRequest request){
+        return restorePasswordService.changePassword(request);
     }
 }
