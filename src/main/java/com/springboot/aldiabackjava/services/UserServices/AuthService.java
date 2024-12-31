@@ -42,6 +42,8 @@ public class AuthService {
     private final IProfileRepository iProfileRepository;
     @Autowired
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private SavePicture savePicture;
     @Value("${user.photos.base.path}")
     private String USER_PHOTOS_BASE_PATH;
     @Value("${user.folders.base.path}")
@@ -90,42 +92,18 @@ public class AuthService {
 
     public ResponseEntity<Map<String, String>> changerPictureProfilService(String photo) {
         Map response =  new HashMap<>();
-        try {
-            byte[] decodedBytes = Base64.getDecoder().decode(photo);
-            User user = jwtInterceptor.getCurrentUser();
-            String directory = this.USER_PHOTOS_BASE_PATH + user.getUsername() + "/";
-            Path path = Paths.get(directory);
-            Files.createDirectories(path); // crea el directorio si este no existe.
-
-            String filename = GetDateNow.getCode() + "profile.webp";
-            Path imagePath = path.resolve(filename);
-            String currentProfilePicturePath = user.getProfile().getProfilePicture();
-
-            try {
-                if (!"private/img/sin_imagen.webp".equals(currentProfilePicturePath)) {
-                    Path currentProfilePicture = Paths.get(this.USER_FOLDERS_BASE_PATH + currentProfilePicturePath);
-                    if (Files.exists(currentProfilePicture)) {
-                        Files.delete(currentProfilePicture);
-                    }
-                }
-            }catch (Exception e){
-                log.error("Cambio de foto de usuario nuevo.");
-            }
-            Files.write(imagePath, decodedBytes);
-            Profile profile = user.getProfile();
-            String finalPath = "/private/img/users/" + user.getUsername() + "/" + filename;
-
-            profile.setProfilePicture(finalPath);
-            iProfileRepository.save(profile);
-            response.put("message", "Cambio exitoso");
-            response.put("status", "200");
-            response.put("url",finalPath);
-            return ResponseEntity.ok().body(response);
-        } catch (IOException e) {
+        byte[] decodedBytes = Base64.getDecoder().decode(photo);
+        User user = jwtInterceptor.getCurrentUser();
+        String finalPath = savePicture.changerPictureProfilService(user,decodedBytes);
+        if (finalPath==null){
             response.put("message", "A ocurrido un error, intentelo de nuevo.");
             response.put("status", "400");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
+        response.put("message", "Cambio exitoso");
+        response.put("status", "200");
+        response.put("url",finalPath);
+        return ResponseEntity.ok().body(response);
     }
 
     public ResponseEntity<String> deleteProfilePictureService() {
