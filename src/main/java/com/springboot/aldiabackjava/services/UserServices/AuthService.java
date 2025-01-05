@@ -2,6 +2,7 @@ package com.springboot.aldiabackjava.services.UserServices;
 
 
 import com.springboot.aldiabackjava.config.JwtInterceptor;
+import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.ChangePasswordRequest;
 import com.springboot.aldiabackjava.services.UserServices.requestAndResponse.RegisterRequest;
 import com.springboot.aldiabackjava.models.userModels.Profile;
 import com.springboot.aldiabackjava.models.userModels.User;
@@ -75,19 +76,25 @@ public class AuthService {
         return user;
     }
 
-    public ResponseEntity<String> changePasswordService(String newPassword){
+    public ResponseEntity<Map<String,String>> changePasswordService(ChangePasswordRequest request){
         User user = jwtInterceptor.getCurrentUser();
-        if (passwordEncoder.matches(newPassword, user.getPassword())){
-            return ResponseEntity.badRequest().body("La nueva contraseña no puede ser igual a la anterior");
+        Map<String,String> response = new HashMap<>();
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())){
+            response.put("status","400");
+            response.put("message", "Te registraste utilizando un servicio externo (Google, Facebook o GitHub). No es posible cambiar la contraseña.");
+            return ResponseEntity.badRequest().body(response);
         }
-        String morValidations = dataValidate.validatePassword(newPassword);
+        String morValidations = dataValidate.validatePassword(request.getNewPassword());
         if (morValidations != null){
-            return ResponseEntity.badRequest().body(morValidations);
+            response.put("status","409");
+            response.put("message",morValidations);
+            return ResponseEntity.badRequest().body(response);
         }
-        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         iUserRepository.save(user);
-        return ResponseEntity.ok().body("La contraseña se cambió correctamente");
-
+        response.put("status","200");
+        response.put("message","La contraseña se cambió correctamente");
+        return ResponseEntity.ok().body(response);
     }
 
     public ResponseEntity<Map<String, String>> changerPictureProfilService(String photo) {

@@ -36,8 +36,8 @@ public class UserController {
     }
 
     @PutMapping("/edit/password")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest request){
-        return authService.changePasswordService(request.getNewPassword());
+    public ResponseEntity<Map<String,String>> changePassword(@RequestBody ChangePasswordRequest request){
+        return authService.changePasswordService(request);
     }
 
     @PutMapping("/edit/picture")

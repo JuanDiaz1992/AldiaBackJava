@@ -76,7 +76,7 @@ public class RestorePasswordService {
             }
             response.put("message","Ah ocurrido un error, por favor intentalo más tarde.");
             response.put("status","500");
-            return ResponseEntity.ok().body(response);
+            return ResponseEntity.badRequest().body(response);
 
         }catch (Exception e){
             response.put("message","Ah ocurrido un error, por favor intentalo más tarde");
