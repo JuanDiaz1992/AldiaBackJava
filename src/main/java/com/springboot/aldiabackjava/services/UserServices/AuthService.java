@@ -55,25 +55,29 @@ public class AuthService {
         return user;
     }
 
-    public User updateProfileService(RegisterRequest userUpdate){
-        User user = null;
-        user = jwtInterceptor.getCurrentUser();
+    public ResponseEntity<Map<String,String>> updateProfileService(RegisterRequest userUpdate){
+        Map<String,String> response = new HashMap<>();
+        User user = jwtInterceptor.getCurrentUser();
         Profile profile = user.getProfile();
-        profile.setName(userUpdate.getName() != null && !userUpdate.getName().isEmpty() ? userUpdate.getName() : profile.getName());
-        profile.setLastName(userUpdate.getLastName() != null && !userUpdate.getLastName().isEmpty() ? userUpdate.getLastName() : profile.getLastName());
-        profile.setSurnamen(userUpdate.getSurnamen() != null && !userUpdate.getSurnamen().isEmpty() ? userUpdate.getSurnamen() : profile.getSurnamen());
-        profile.setTypeDocument(userUpdate.getTypeDocument() != null ? userUpdate.getTypeDocument() : profile.getTypeDocument());
-        profile.setDocument(userUpdate.getDocument() != null && !userUpdate.getDocument().isEmpty() ? userUpdate.getDocument() : profile.getDocument());
-        profile.setProfilePicture(userUpdate.getProfilePicture() != null && !userUpdate.getProfilePicture().isEmpty() ? userUpdate.getProfilePicture() : profile.getProfilePicture());
-        profile.setBirthDate(userUpdate.getBirthDate() != null && !userUpdate.getBirthDate().isEmpty() ? userUpdate.getBirthDate() : profile.getBirthDate());
-        profile.setDepartment(userUpdate.getDepartment() != null && !userUpdate.getDepartment().isEmpty() ? userUpdate.getDepartment() : profile.getDepartment());
-        profile.setTown(userUpdate.getTown() != null && !userUpdate.getTown().isEmpty() ? userUpdate.getTown() : profile.getTown());
-        profile.setAddress(userUpdate.getAddress() != null && !userUpdate.getAddress().isEmpty() ? userUpdate.getAddress() : profile.getAddress());
-        profile.setCivilStatus(userUpdate.getCivilStatus() != null? userUpdate.getCivilStatus() : profile.getCivilStatus());
-        profile.setNumberPhone(userUpdate.getNumberPhone() != null && !userUpdate.getNumberPhone().isEmpty() ? userUpdate.getNumberPhone() : profile.getNumberPhone());
-        profile.setOccupation(userUpdate.getOccupation() != null && !userUpdate.getOccupation().isEmpty() ? userUpdate.getOccupation() : profile.getOccupation());
-        iProfileRepository.save(profile);
-        return user;
+        try{
+            profile.setName(userUpdate.getName() != null && !userUpdate.getName().isEmpty() ? userUpdate.getName() : profile.getName());
+            profile.setLastName(userUpdate.getLastName() != null && !userUpdate.getLastName().isEmpty() ? userUpdate.getLastName() : profile.getLastName());
+            profile.setSurnamen(userUpdate.getSurnamen() != null && !userUpdate.getSurnamen().isEmpty() ? userUpdate.getSurnamen() : profile.getSurnamen());
+            profile.setTypeDocument(userUpdate.getTypeDocument() != null ? userUpdate.getTypeDocument() : profile.getTypeDocument());
+            profile.setDocument(userUpdate.getDocument() != null && !userUpdate.getDocument().isEmpty() ? userUpdate.getDocument() : profile.getDocument());
+            profile.setBirthDate(userUpdate.getBirthDate() != null && !userUpdate.getBirthDate().isEmpty() ? userUpdate.getBirthDate() : profile.getBirthDate());
+            profile.setDepartment(userUpdate.getDepartment() != null && !userUpdate.getDepartment().isEmpty() ? userUpdate.getDepartment() : profile.getDepartment());
+            profile.setTown(userUpdate.getTown() != null && !userUpdate.getTown().isEmpty() ? userUpdate.getTown() : profile.getTown());
+            profile.setAddress(userUpdate.getAddress() != null && !userUpdate.getAddress().isEmpty() ? userUpdate.getAddress() : profile.getAddress());
+            profile.setCivilStatus(userUpdate.getCivilStatus() != null? userUpdate.getCivilStatus() : profile.getCivilStatus());
+            profile.setNumberPhone(userUpdate.getNumberPhone() != null && !userUpdate.getNumberPhone().isEmpty() ? userUpdate.getNumberPhone() : profile.getNumberPhone());
+            profile.setOccupation(userUpdate.getOccupation() != null && !userUpdate.getOccupation().isEmpty() ? userUpdate.getOccupation() : profile.getOccupation());
+            iProfileRepository.save(profile);
+            log.info(userUpdate.toString());
+            return ResponseEntity.ok().body(response);
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     public ResponseEntity<Map<String,String>> changePasswordService(ChangePasswordRequest request){

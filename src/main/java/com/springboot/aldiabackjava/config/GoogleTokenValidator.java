@@ -22,14 +22,12 @@ public class GoogleTokenValidator  {
             GoogleIdToken token = GoogleIdToken.parse(JSON_FACTORY, idTokenString);
             GoogleIdToken.Payload payload = token.getPayload();
             Map<String, Object> userData = new HashMap<>();
-
             userData.put("userId", payload.getSubject()); // ID del usuario
             userData.put("email", payload.getEmail()); // Correo electrónico
             userData.put("name", payload.get("name")); // Nombre completo
             userData.put("givenName", payload.get("given_name")); // Nombre
             userData.put("familyName", payload.get("family_name")); // Apellido
             userData.put("picture",payload.get("picture"));
-            System.out.println(payload);
             return userData;
         } catch (Exception e) {
             e.printStackTrace();
