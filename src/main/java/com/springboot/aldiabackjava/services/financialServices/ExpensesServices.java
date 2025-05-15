@@ -74,7 +74,7 @@ public class ExpensesServices {
 
     public ResponseEntity<List<Expense>> getExpensesForYearService(String date) {
         User user = jwtInterceptor.getCurrentUser();
-        List<Expense> expenses = iExpenseRespository.findByUserIdAndYear(user.getIdUser(),date);
+        List<Expense> expenses = iExpenseRespository.findByUserIdAndYear(user.getIdUser(), Integer.parseInt(date));
         if (expenses.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenses);
         }

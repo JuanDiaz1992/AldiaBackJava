@@ -9,13 +9,16 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface IIncomeRepository extends JpaRepository<Income,Integer> {
-    @Query("SELECT i FROM Income i WHERE i.user.idUser = :id_user AND EXTRACT(YEAR FROM i.date) = :year")
-    List<Income> findByUserIdAndYear(@Param("id_user") int idUser, @Param("year") String year);
+public interface IIncomeRepository extends JpaRepository<Income, Integer> {
+    @Query("SELECT i FROM Income i WHERE i.user.idUser = :id_user AND YEAR(i.date) = :year")
+    List<Income> findByUserIdAndYear(@Param("id_user") int idUser, @Param("year") int year);
 
-    @Query("SELECT i FROM Income i WHERE i.user.idUser = :id_user AND TO_CHAR(i.date, 'YYYY-MM') = :yearMonth")
+
+    @Query("SELECT i FROM Income i WHERE i.user.idUser = :id_user AND DATE_FORMAT(i.date, '%Y-%m') = :yearMonth")
     Page<Income> findByUserIdAndYearMonthPageable(@Param("id_user") int idUser, @Param("yearMonth") String yearMonth, Pageable pageable);
 
-    @Query("SELECT i FROM Income i WHERE i.user.idUser = :id_user AND TO_CHAR(i.date, 'YYYY-MM') = :yearMonth")
+
+    @Query("SELECT i FROM Income i WHERE i.user.idUser = :id_user AND DATE_FORMAT(i.date, '%Y-%m') = :yearMonth")
     List<Income> findByUserIdAndYearMonth(@Param("id_user") int idUser, @Param("yearMonth") String yearMonth);
 }
+

@@ -12,7 +12,7 @@ public class TeseractConfig {
     @Bean
     Tesseract teseract(){
         Tesseract tesseract = new Tesseract();
-        tesseract.setDatapath("/usr/share/tesseract-ocr/5/tessdata");
+        tesseract.setDatapath("C:\\Program Files\\Tesseract-OCR\\tessdata");
         tesseract.setLanguage("spa");
         return tesseract;
     }

@@ -70,8 +70,8 @@ public class FinancialServices {
     public ResponseEntity<Map<String, Integer>> getIncomesAndExpensesYear(String date){
         Map<String,Integer> list = new HashMap<>();
         User user = jwtInterceptor.getCurrentUser();
-        List<Expense> expenses = iExpenseRespository.findByUserIdAndYear(user.getIdUser(),date);
-        List<Income> incomes = iIncomeRepository.findByUserIdAndYear(user.getIdUser(), date);
+        List<Expense> expenses = iExpenseRespository.findByUserIdAndYear(user.getIdUser(), Integer.parseInt(date));
+        List<Income> incomes = iIncomeRepository.findByUserIdAndYear(user.getIdUser(), Integer.parseInt(date));
         AtomicInteger totalCashExpenses = new AtomicInteger();
         AtomicInteger totalCahsIncomes = new AtomicInteger();
         if (!expenses.isEmpty()){
@@ -129,8 +129,8 @@ public class FinancialServices {
         try {
             List<Expense> expensesForMonth = iExpenseRespository.findByUserIdAndYearMonth(user.getIdUser(),mount);
             List<Income> incomesForMonth = iIncomeRepository.findByUserIdAndYearMonth(user.getIdUser(), mount);
-            List<Expense> expensesForYear = iExpenseRespository.findByUserIdAndYear(user.getIdUser(),year);
-            List<Income> incomesForYear = iIncomeRepository.findByUserIdAndYear(user.getIdUser(), year);
+            List<Expense> expensesForYear = iExpenseRespository.findByUserIdAndYear(user.getIdUser(), Integer.parseInt(year));
+            List<Income> incomesForYear = iIncomeRepository.findByUserIdAndYear(user.getIdUser(), Integer.parseInt(year));
             int totalIncomesForMonth = FinancialServices.sumNumbers(incomesForMonth,null);
             int totalIncomesForYear = FinancialServices.sumNumbers(incomesForYear,null);
             int totalExpenseForMonth = FinancialServices.sumNumbers(null,expensesForMonth);

@@ -16,11 +16,10 @@ public class EmailSender {
 
     private final String username;
     private final String password;
-    @Autowired
-    public EmailSender(@Value("${mail}") String username,
-                       @Value("${passwordmail}") String password) {
-        this.username = username;
-        this.password = password;
+
+    public EmailSender() {
+        this.username = "juannavegante2010@gmail.com";
+        this.password = "wfst tmii yooo miyw";
     }
 
     public void senMail(String mailTo, String subjetct, String message)  {

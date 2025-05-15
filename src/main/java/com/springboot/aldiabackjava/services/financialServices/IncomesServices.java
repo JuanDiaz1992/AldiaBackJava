@@ -52,7 +52,7 @@ public class IncomesServices {
 
     public ResponseEntity<List<Income>> getIncomesForYearService(String date) {
         User user = jwtInterceptor.getCurrentUser();
-        List<Income> incomes = iIncomeRepository.findByUserIdAndYear(user.getIdUser(),date);
+        List<Income> incomes = iIncomeRepository.findByUserIdAndYear(user.getIdUser(), Integer.parseInt(date));
         if (incomes.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(incomes);
         }
