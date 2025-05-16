@@ -121,7 +121,7 @@ public class FinancialServices {
     }
 
 
-    public ResponseEntity<Map<String,Integer>> getBalanceService(String date) {
+    public ResponseEntity<Map<String, Integer>> getBalanceService(String date) {
         String year = date.substring(0,4);
         String mount = date.substring(0,7);
         User user = jwtInterceptor.getCurrentUser();
@@ -131,6 +131,13 @@ public class FinancialServices {
             List<Income> incomesForMonth = iIncomeRepository.findByUserIdAndYearMonth(user.getIdUser(), mount);
             List<Expense> expensesForYear = iExpenseRespository.findByUserIdAndYear(user.getIdUser(), Integer.parseInt(year));
             List<Income> incomesForYear = iIncomeRepository.findByUserIdAndYear(user.getIdUser(), Integer.parseInt(year));
+            int totalIngresos = iIncomeRepository.findByUser(user).stream()
+                    .mapToInt(Income::getAmount)
+                    .sum();
+            int totalGastos = iExpenseRespository.findByUser(user).stream()
+                    .mapToInt(Expense::getAmount)
+                    .sum();
+            int totalAcoumaldo = totalIngresos - totalGastos;
             int totalIncomesForMonth = FinancialServices.sumNumbers(incomesForMonth,null);
             int totalIncomesForYear = FinancialServices.sumNumbers(incomesForYear,null);
             int totalExpenseForMonth = FinancialServices.sumNumbers(null,expensesForMonth);
@@ -139,6 +146,10 @@ public class FinancialServices {
             int totalBalanceForYear = totalIncomesForYear - totalExpensesForYear;
             response.put("balanceYear",totalBalanceForYear);
             response.put("balanceMounth",totalBalanceForMonth);
+            response.put("totalIngresos", totalIngresos);
+            response.put("totalGastos", totalGastos);
+            response.put("totalAcoumaldo", totalAcoumaldo);
+            response.put("totalIngresosEnElAnho", totalIncomesForYear);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
