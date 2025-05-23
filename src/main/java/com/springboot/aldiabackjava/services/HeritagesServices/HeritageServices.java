@@ -1,4 +1,4 @@
-package com.springboot.aldiabackjava.services;
+package com.springboot.aldiabackjava.services.HeritagesServices;
 
 import com.springboot.aldiabackjava.config.JwtInterceptor;
 import com.springboot.aldiabackjava.models.heritages.Heritages;
@@ -33,12 +33,13 @@ public class HeritageServices {
             if (heritages.getTypeHeritages()!=null && !heritages.getAcquisitionDate().equals("") && heritages.getCurrenValue()>0){
                 Heritages heritagesToCreate = new Heritages().builder()
                         .typeHeritages(heritages.getTypeHeritages())
-                        .acquisitionValue(heritages.getAcquisitionValue())
                         .acquisitionDate(heritages.getAcquisitionDate())
+                        .location(heritages.getLocation())
+                        .percentage(heritages.getPercentage())
                         .currenValue(heritages.getCurrenValue())
                         .user(user)
                         .description(heritages.getDescription()).build();
-                ihEritageRepository.equals(heritagesToCreate);
+                ihEritageRepository.save(heritagesToCreate);
                 response.put("message","Registro guardado correctamente");
                 response.put("status","200");
                 return ResponseEntity.ok().body(response);
@@ -97,9 +98,10 @@ public class HeritageServices {
             if(heritageToEdit.getUser().equals(user) && heritageToEdit!=null){
                 heritageToEdit.setTypeHeritages(heritage.getTypeHeritages());
                 heritageToEdit.setDescription(heritage.getDescription());
+                heritageToEdit.setLocation(heritage.getLocation());
+                heritageToEdit.setPercentage(heritage.getPercentage());
                 heritageToEdit.setAcquisitionDate(heritage.getAcquisitionDate());
                 heritageToEdit.setCurrenValue(heritage.getCurrenValue());
-                heritageToEdit.setAcquisitionValue(heritage.getAcquisitionValue());
                 ihEritageRepository.save(heritageToEdit);
                 response.put("message", "Registro editado correctamente");
                 response.put("status", "200");

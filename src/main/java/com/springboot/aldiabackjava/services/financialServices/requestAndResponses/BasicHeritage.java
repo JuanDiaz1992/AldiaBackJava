@@ -23,4 +23,7 @@ public class BasicHeritage {
     Date acquisitionDate;
     String description;
     TypeHeritages typeHeritages;
+    String location;
+    Integer percentage;
+
 }

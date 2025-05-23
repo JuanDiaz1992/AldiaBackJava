@@ -1,8 +1,10 @@
 package com.springboot.aldiabackjava.controller;
 
 import com.springboot.aldiabackjava.models.heritages.Heritages;
-import com.springboot.aldiabackjava.services.HeritageServices;
+import com.springboot.aldiabackjava.services.HeritagesServices.HeritageServices;
+import com.springboot.aldiabackjava.services.HeritagesServices.TypeHeritagesServices;
 import com.springboot.aldiabackjava.services.financialServices.requestAndResponses.BasicHeritage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,15 +12,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/users/heritages")
 public class HeritagesController {
-    @Autowired
-    HeritageServices heritageServices;
+    public final HeritageServices heritageServices;
+    public final TypeHeritagesServices typeHeritagesServices;
+
 
     @PostMapping("/saveheritage")
     public ResponseEntity<Map<String,String>> saveHeritage(@RequestBody BasicHeritage basicHeritage){
@@ -43,6 +46,11 @@ public class HeritagesController {
     @GetMapping("/gettotalheritages")
     public ResponseEntity<Map<String,String>>getTotalHeritages(){
         return heritageServices.getTotalheritagesService();
+    }
+
+    @GetMapping("/types-heritages")
+    public ResponseEntity<Map<String, Object>> getTypesHeritages(){
+        return typeHeritagesServices.getAllTypes();
     }
 }
 

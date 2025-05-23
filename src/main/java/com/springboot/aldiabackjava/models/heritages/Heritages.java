@@ -25,13 +25,13 @@ public class Heritages {
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @JsonIgnore
     private User user;
-    @Column(name="acquisition_value")
-    private int acquisitionValue;
     @Column(name="curren_value")
     private int currenValue;
     @Column(name="acquisition_date")
-    Date acquisitionDate;
-    String description;
+    private Date acquisitionDate;
+    private String description;
+    private String location;
+    private Integer percentage;
     @ManyToOne
     @JoinColumn(name = "type_heritages", referencedColumnName = "id_type_heritage")
     TypeHeritages typeHeritages;
