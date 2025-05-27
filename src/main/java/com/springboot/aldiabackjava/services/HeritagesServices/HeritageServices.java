@@ -12,9 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 
 @Service
@@ -118,33 +117,57 @@ public class HeritageServices {
         }
     }
 
-    public ResponseEntity<Map<String, String>> getTotalheritagesService() {
-        Map<String, String> response = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> getDetailedHeritagesService() {
+        Map<String, Object> response = new HashMap<>();
         User user = jwtInterceptor.getCurrentUser();
-        Integer total = 0;
+        int total = 0;
 
         try {
             List<Heritages> heritages = ihEritageRepository.findByUserIdUser(user.getIdUser());
+
             if (heritages == null || heritages.isEmpty()) {
-                response.put("total", total.toString());
-                response.put("message", "No hay registro de patrimonios");
-                response.put("status", "409");
-                return ResponseEntity.status(409).body(response); // Cambiar al código correcto.
+                response.put("total", total);
+                response.put("heritages", Collections.emptyList());
+                response.put("message", "No hay registros de patrimonios");
+                response.put("status", HttpStatus.OK.value());
+                return ResponseEntity.ok().body(response);
             }
+
+            // Calcular el total y preparar la lista de detalles
+            List<Map<String, Object>> heritageDetails = new ArrayList<>();
 
             for (Heritages heritage : heritages) {
                 total += heritage.getCurrenValue();
+
+                Map<String, Object> detail = new HashMap<>();
+                detail.put("id", heritage.getIdHeritage());
+                detail.put("description", heritage.getDescription());
+                detail.put("value", heritage.getCurrenValue());
+                detail.put("type", heritage.getTypeHeritages() != null ?
+                        heritage.getTypeHeritages().getName() : "Sin tipo");
+                detail.put("acquisitionDate", heritage.getAcquisitionDate());
+                detail.put("location", heritage.getLocation());
+                detail.put("percentage", heritage.getPercentage());
+
+                heritageDetails.add(detail);
             }
 
-            response.put("total", total.toString());
-            response.put("status", "200");
+            response.put("total", total);
+            response.put("heritages", heritageDetails);
+            response.put("count", heritages.size());
+            response.put("status", HttpStatus.OK.value());
+
             return ResponseEntity.ok().body(response);
 
-        } catch (Exception e) { // Captura todas las excepciones inesperadas.
-            response.put("total", total.toString());
-            response.put("message", "Ocurrió un error inesperado");
-            response.put("status", "500");
-            return ResponseEntity.status(500).body(response);
+        } catch (Exception e) {
+            log.error("Error al obtener patrimonios: ", e);
+
+            response.put("total", 0);
+            response.put("heritages", Collections.emptyList());
+            response.put("message", "Ocurrió un error al obtener los patrimonios");
+            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+
+            return ResponseEntity.internalServerError().body(response);
         }
     }
 
