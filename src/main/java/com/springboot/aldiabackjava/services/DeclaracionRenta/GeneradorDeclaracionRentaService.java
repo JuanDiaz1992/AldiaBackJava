@@ -33,9 +33,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+
 @Service
 @Slf4j
 public class GeneradorDeclaracionRentaService {
@@ -49,39 +48,49 @@ public class GeneradorDeclaracionRentaService {
     @Autowired
     private IHEritageRepository heritageRepository;
 
-    public ResponseEntity<InputStreamResource> generarDeclaracionRentaPDF() {
+    public ResponseEntity<Map<String, Object>> generarDeclaracionRentaPDF() {
         User user = jwtInterceptor.getCurrentUser();
         if (user == null || user.getProfile() == null) {
             log.error("Usuario o perfil no encontrado");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        log.info("AQUI :D");
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-
         try {
-            // 1. Generar el PDF
+            // Generar el PDF
             generarContenidoPDF(out, user);
-
-            // 2. Verificar que el PDF no esté vacío
             byte[] pdfBytes = out.toByteArray();
+
             if (pdfBytes.length == 0) {
                 throw new IOException("El PDF generado está vacío");
             }
 
             log.info("PDF generado exitosamente. Tamaño: {} bytes", pdfBytes.length);
 
-            // 3. Crear el InputStreamResource sin cerrar el ByteArrayOutputStream
-            InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(pdfBytes));
+            // Codificar el PDF en Base64 para enviarlo en el JSON
+            String pdfBase64 = Base64.getEncoder().encodeToString(pdfBytes);
+
+            // Crear estructura de respuesta con el campo data
+            Map<String, Object> response = new HashMap<>();
+            Map<String, Object> data = new HashMap<>();
+
+            data.put("pdf", pdfBase64);
+            data.put("filename", "declaracion_renta_" + user.getProfile().getDocument() + ".pdf");
+            response.put("data", data);
+            response.put("success", true);
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=declaracion_renta_" + user.getProfile().getDocument() + ".pdf")
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .body(resource);
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
 
         } catch (Exception e) {
             log.error("Error al generar PDF", e);
-            return ResponseEntity.internalServerError().build();
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "Error al generar el PDF");
+            return ResponseEntity.internalServerError()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(errorResponse);
         } finally {
             try {
                 out.close();
@@ -90,7 +99,6 @@ public class GeneradorDeclaracionRentaService {
             }
         }
     }
-
     private void generarContenidoPDF(ByteArrayOutputStream out, User user) throws IOException {
         List<Income> ingresos = validarIngresos(incomeRepository.findByUserIdAndYear(user.getIdUser(), 2024));
         List<Heritages> patrimonios = validarPatrimonios(heritageRepository.findByUserIdUser(user.getIdUser()));
@@ -132,7 +140,7 @@ public class GeneradorDeclaracionRentaService {
                 .setFont(fontBold)
                 .setFontSize(12));
 
-        document.add(new Paragraph("Nombre: " + safeText(user.getProfile().getName()))
+        document.add(new Paragraph("Nombre: " + safeText(user.getProfile().getName() + " " + user.getProfile().getLastName() + " " + user.getProfile().getSurnamen()))
                 .setFont(fontNormal));
         document.add(new Paragraph("Documento: " + safeText(user.getProfile().getDocument()))
                 .setFont(fontNormal));

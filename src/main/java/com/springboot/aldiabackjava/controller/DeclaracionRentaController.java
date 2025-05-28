@@ -24,7 +24,7 @@ public class DeclaracionRentaController {
         return declaracionRentaService.verificarDeclaracionRenta2025();
     }
     @GetMapping("/generar-declaracion")
-    public ResponseEntity<InputStreamResource> generarDeclaracion(){
+    public ResponseEntity<Map<String, Object>> generarDeclaracion(){
         return  generadorDeclaracionRentaService.generarDeclaracionRentaPDF();
     }
 }
