@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<Map<String,String>> editUser(@RequestBody RegisterRequest userUpdate){
+    public ResponseEntity<Map<String,Object>> editUser(@RequestBody RegisterRequest userUpdate){
         return authService.updateProfileService(userUpdate);
 
     }

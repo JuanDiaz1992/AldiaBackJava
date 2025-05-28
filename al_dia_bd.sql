@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 27-05-2025 a las 19:42:52
+-- Tiempo de generación: 28-05-2025 a las 06:58:12
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -199,7 +199,8 @@ CREATE TABLE `heritages` (
 --
 
 INSERT INTO `heritages` (`id_heritage`, `acquisition_date`, `acquisition_value`, `curren_value`, `description`, `type_heritages`, `id_user`, `location`, `percentage`) VALUES
-(1, '2025-05-07', NULL, 100000000, 'Casa de dos pisos y parqueadero', 1, 1, 'Calle 15#3-15 Bogotá', 30);
+(1, '2024-05-07', NULL, 100000000, 'Casa de dos pisos y parqueadero', 1, 1, 'Calle 15#3-15 Bogotá', 30),
+(2, '2024-05-07', NULL, 150000000, 'Mazda x1', 4, 1, NULL, 100);
 
 -- --------------------------------------------------------
 
@@ -228,11 +229,9 @@ INSERT INTO `incomes` (`id_income`, `amount`, `date`, `description`, `is_planned
 (3, 1500000, '2025-05-20', 'Pago página web', b'0', '', 2, 1),
 (4, 300000, '2025-04-23', 'CDT', b'0', '', 7, 1),
 (5, 12000000, '2025-03-12', 'Me gane la lotería', b'0', '', 18, 1),
-(6, 20000000, '2024-10-22', 'Me gane el chance', b'0', '', 11, 1),
-(7, 7999997, '2024-03-19', 'sueldo ', b'0', '', 1, 1),
-(8, 60000000, '2025-03-13', 'Comiciones por ventas de vehiculos en el año', b'0', '', 4, 1),
 (9, 1200000, '2025-05-25', 'Pago de cliente', b'0', NULL, 2, 1),
-(10, 133999, '2025-05-25', 'Pago de cliente por página web', b'0', NULL, 2, 1);
+(10, 133999, '2025-05-25', 'Pago de cliente por página web', b'0', NULL, 2, 1),
+(11, 80000000, '2024-12-27', 'Ganacias', b'0', '', 4, 1);
 
 -- --------------------------------------------------------
 
@@ -277,7 +276,7 @@ CREATE TABLE `profiles` (
 --
 
 INSERT INTO `profiles` (`id_profile`, `address`, `birth_date`, `civil_status`, `data_treatment`, `department`, `document`, `exogenous`, `last_name`, `name`, `number_phone`, `occupation`, `profile_picture`, `surname`, `town`, `type_document`) VALUES
-(1, NULL, NULL, NULL, NULL, NULL, NULL, 0, 'Díaz', 'Juan Camilo', NULL, NULL, NULL, 'Valencia', NULL, NULL);
+(1, 'Cr 7#9-20', '01/03/1992', NULL, NULL, NULL, '1040740765', 0, 'Díaz', 'Juan Camilo', NULL, NULL, NULL, 'Valencia', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -458,7 +457,7 @@ ALTER TABLE `expenses`
 -- AUTO_INCREMENT de la tabla `heritages`
 --
 ALTER TABLE `heritages`
-  MODIFY `id_heritage` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_heritage` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `incomes`

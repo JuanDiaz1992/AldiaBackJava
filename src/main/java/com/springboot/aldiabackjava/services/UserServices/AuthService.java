@@ -55,27 +55,65 @@ public class AuthService {
         return user;
     }
 
-    public ResponseEntity<Map<String,String>> updateProfileService(RegisterRequest userUpdate){
-        Map<String,String> response = new HashMap<>();
-        User user = jwtInterceptor.getCurrentUser();
-        Profile profile = user.getProfile();
-        try{
-            profile.setName(userUpdate.getName() != null && !userUpdate.getName().isEmpty() ? userUpdate.getName() : profile.getName());
-            profile.setLastName(userUpdate.getLastName() != null && !userUpdate.getLastName().isEmpty() ? userUpdate.getLastName() : profile.getLastName());
-            profile.setSurnamen(userUpdate.getSurnamen() != null && !userUpdate.getSurnamen().isEmpty() ? userUpdate.getSurnamen() : profile.getSurnamen());
-            profile.setTypeDocument(userUpdate.getTypeDocument() != null ? userUpdate.getTypeDocument() : profile.getTypeDocument());
-            profile.setDocument(userUpdate.getDocument() != null && !userUpdate.getDocument().isEmpty() ? userUpdate.getDocument() : profile.getDocument());
-            profile.setBirthDate(userUpdate.getBirthDate() != null && !userUpdate.getBirthDate().isEmpty() ? userUpdate.getBirthDate() : profile.getBirthDate());
-            profile.setDepartment(userUpdate.getDepartment() != null && !userUpdate.getDepartment().isEmpty() ? userUpdate.getDepartment() : profile.getDepartment());
-            profile.setTown(userUpdate.getTown() != null && !userUpdate.getTown().isEmpty() ? userUpdate.getTown() : profile.getTown());
-            profile.setAddress(userUpdate.getAddress() != null && !userUpdate.getAddress().isEmpty() ? userUpdate.getAddress() : profile.getAddress());
-            profile.setCivilStatus(userUpdate.getCivilStatus() != null? userUpdate.getCivilStatus() : profile.getCivilStatus());
-            profile.setNumberPhone(userUpdate.getNumberPhone() != null && !userUpdate.getNumberPhone().isEmpty() ? userUpdate.getNumberPhone() : profile.getNumberPhone());
-            profile.setOccupation(userUpdate.getOccupation() != null && !userUpdate.getOccupation().isEmpty() ? userUpdate.getOccupation() : profile.getOccupation());
+    public ResponseEntity<Map<String, Object>> updateProfileService(RegisterRequest userUpdate) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User user = jwtInterceptor.getCurrentUser();
+            if (user == null || user.getProfile() == null) {
+                response.put("status", 401);
+                response.put("message", "Usuario no autorizado o perfil no encontrado");
+                return ResponseEntity.status(401).body(response);
+            }
+
+            Profile profile = user.getProfile();
+
+            // Actualizar campos si no vienen vacíos o nulos
+            if (userUpdate.getName() != null && !userUpdate.getName().isBlank())
+                profile.setName(userUpdate.getName());
+
+            if (userUpdate.getLastName() != null && !userUpdate.getLastName().isBlank())
+                profile.setLastName(userUpdate.getLastName());
+
+            if (userUpdate.getSurnamen() != null && !userUpdate.getSurnamen().isBlank())
+                profile.setSurnamen(userUpdate.getSurnamen());
+
+
+
+            if (userUpdate.getDocument() != null && !userUpdate.getDocument().isBlank())
+                profile.setDocument(userUpdate.getDocument());
+
+            if (userUpdate.getBirthDate() != null && !userUpdate.getBirthDate().isBlank())
+                profile.setBirthDate(userUpdate.getBirthDate());
+
+            if (userUpdate.getDepartment() != null && !userUpdate.getDepartment().isBlank())
+                profile.setDepartment(userUpdate.getDepartment());
+
+            if (userUpdate.getTown() != null && !userUpdate.getTown().isBlank())
+                profile.setTown(userUpdate.getTown());
+
+            if (userUpdate.getAddress() != null && !userUpdate.getAddress().isBlank())
+                profile.setAddress(userUpdate.getAddress());
+
+
+            if (userUpdate.getNumberPhone() != null && !userUpdate.getNumberPhone().isBlank())
+                profile.setNumberPhone(userUpdate.getNumberPhone());
+
+            if (userUpdate.getOccupation() != null && !userUpdate.getOccupation().isBlank())
+                profile.setOccupation(userUpdate.getOccupation());
+
+            if (userUpdate.getDataTreatment() != null)
+                profile.setDataTreatment(userUpdate.getDataTreatment());
+
             iProfileRepository.save(profile);
-            log.info(userUpdate.toString());
-            return ResponseEntity.ok().body(response);
-        }catch(Exception e){
+
+            response.put("status", 200);
+            response.put("message", "Sus datos se modificaron correctamente");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("Error al actualizar el perfil del usuario", e);
+            response.put("status", 400);
+            response.put("message", "Ocurrió un error al actualizar sus datos. Intente más tarde.");
             return ResponseEntity.badRequest().body(response);
         }
     }
