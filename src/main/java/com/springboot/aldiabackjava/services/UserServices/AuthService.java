@@ -77,7 +77,13 @@ public class AuthService {
             if (userUpdate.getSurnamen() != null && !userUpdate.getSurnamen().isBlank())
                 profile.setSurnamen(userUpdate.getSurnamen());
 
+            if (userUpdate.getTypeDocument() != null) {
+                profile.setTypeDocument(userUpdate.getTypeDocument());
+            }
 
+            if (userUpdate.getCivilStatus() != null) {
+                profile.setCivilStatus(userUpdate.getCivilStatus());
+            }
 
             if (userUpdate.getDocument() != null && !userUpdate.getDocument().isBlank())
                 profile.setDocument(userUpdate.getDocument());

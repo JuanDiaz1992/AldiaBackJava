@@ -39,6 +39,8 @@ import java.util.*;
 @Slf4j
 public class GeneradorDeclaracionRentaService {
 
+    private static final Logger logger = LoggerFactory.getLogger(GeneradorDeclaracionRentaService.class);
+
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
@@ -51,8 +53,14 @@ public class GeneradorDeclaracionRentaService {
     public ResponseEntity<Map<String, Object>> generarDeclaracionRentaPDF() {
         User user = jwtInterceptor.getCurrentUser();
         if (user == null || user.getProfile() == null) {
-            log.error("Usuario o perfil no encontrado");
+            logger.error("Usuario o perfil no encontrado");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Validar datos primordiales antes de continuar
+        ResponseEntity<Map<String, Object>> validacion = validarDatosPrimordiales(user);
+        if (validacion != null) {
+            return validacion;
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -62,18 +70,18 @@ public class GeneradorDeclaracionRentaService {
             byte[] pdfBytes = out.toByteArray();
 
             if (pdfBytes.length == 0) {
+                logger.error("El PDF generado está vacío");
                 throw new IOException("El PDF generado está vacío");
             }
 
-            log.info("PDF generado exitosamente. Tamaño: {} bytes", pdfBytes.length);
+            logger.info("PDF generado exitosamente. Tamaño: {} bytes", pdfBytes.length);
 
             // Codificar el PDF en Base64 para enviarlo en el JSON
             String pdfBase64 = Base64.getEncoder().encodeToString(pdfBytes);
 
-            // Crear estructura de respuesta con el campo data
+            // Crear estructura de respuesta
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> data = new HashMap<>();
-
             data.put("pdf", pdfBase64);
             data.put("filename", "declaracion_renta_" + user.getProfile().getDocument() + ".pdf");
             response.put("data", data);
@@ -84,10 +92,10 @@ public class GeneradorDeclaracionRentaService {
                     .body(response);
 
         } catch (Exception e) {
-            log.error("Error al generar PDF", e);
+            logger.error("Error al generar PDF", e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("error", "Error al generar el PDF");
+            errorResponse.put("error", "Error al generar el PDF: " + e.getMessage());
             return ResponseEntity.internalServerError()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(errorResponse);
@@ -95,26 +103,68 @@ public class GeneradorDeclaracionRentaService {
             try {
                 out.close();
             } catch (IOException e) {
-                log.error("Error al cerrar el stream", e);
+                logger.error("Error al cerrar el stream", e);
             }
         }
     }
+
+    private ResponseEntity<Map<String, Object>> validarDatosPrimordiales(User user) {
+        List<String> camposFaltantes = new ArrayList<>();
+
+        // Validar datos básicos del perfil
+        if (user.getProfile().getDocument() == null || user.getProfile().getDocument().trim().isEmpty()) {
+            camposFaltantes.add("documento");
+        }
+        if (user.getProfile().getName() == null || user.getProfile().getName().trim().isEmpty()) {
+            camposFaltantes.add("nombre");
+        }
+        if (user.getProfile().getLastName() == null || user.getProfile().getLastName().trim().isEmpty()) {
+            camposFaltantes.add("apellido");
+        }
+        if (user.getProfile().getSurnamen() == null || user.getProfile().getSurnamen().trim().isEmpty()) {
+            camposFaltantes.add("segundo apellido");
+        }
+        if (user.getProfile().getAddress() == null || user.getProfile().getAddress().trim().isEmpty()) {
+            camposFaltantes.add("dirección");
+        }
+        if (user.getProfile().getNumberPhone() == null || user.getProfile().getNumberPhone().trim().isEmpty()) {
+            camposFaltantes.add("teléfono");
+        }
+        if (user.getProfile().getTown() == null || user.getProfile().getTown().trim().isEmpty()) {
+            camposFaltantes.add("ciudad");
+        }
+
+        if (!camposFaltantes.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("error", "Datos incompletos");
+            response.put("message", "Debe completar toda la información personal antes de generar la declaración de renta");
+            response.put("camposFaltantes", camposFaltantes);
+
+            logger.warn("Intento de generar declaración con datos faltantes. Usuario: {}, Campos faltantes: {}",
+                    user.getIdUser(), camposFaltantes);
+
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+        }
+
+        return null;
+    }
+
     private void generarContenidoPDF(ByteArrayOutputStream out, User user) throws IOException {
         List<Income> ingresos = validarIngresos(incomeRepository.findByUserIdAndYear(user.getIdUser(), 2024));
         List<Heritages> patrimonios = validarPatrimonios(heritageRepository.findByUserIdUser(user.getIdUser()));
 
-        // 1. Configuración inicial del documento
         PdfWriter writer = new PdfWriter(out);
         PdfDocument pdf = new PdfDocument(writer);
         Document document = new Document(pdf);
 
         try {
-            // 2. Configurar fuentes
             PdfFont fontBold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
             PdfFont fontNormal = PdfFontFactory.createFont(StandardFonts.HELVETICA);
             PdfFont fontItalic = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
 
-            // 3. Contenido del documento
             agregarTitulo(document, fontBold);
             agregarInformacionUsuario(document, user, fontBold, fontNormal);
             agregarIngresos(document, ingresos, fontBold, fontNormal);
@@ -122,7 +172,6 @@ public class GeneradorDeclaracionRentaService {
             agregarPiePagina(document, fontItalic);
 
         } finally {
-            // 4. Cerrar el documento (esto es crítico)
             document.close();
         }
     }
@@ -140,11 +189,16 @@ public class GeneradorDeclaracionRentaService {
                 .setFont(fontBold)
                 .setFontSize(12));
 
-        document.add(new Paragraph("Nombre: " + safeText(user.getProfile().getName() + " " + user.getProfile().getLastName() + " " + user.getProfile().getSurnamen()))
+        document.add(new Paragraph("Nombre: " + safeText(user.getProfile().getName() + " " +
+                user.getProfile().getLastName() + " " + user.getProfile().getSurnamen()))
                 .setFont(fontNormal));
         document.add(new Paragraph("Documento: " + safeText(user.getProfile().getDocument()))
                 .setFont(fontNormal));
         document.add(new Paragraph("Dirección: " + safeText(user.getProfile().getAddress()))
+                .setFont(fontNormal));
+        document.add(new Paragraph("Ciudad: " + safeText(user.getProfile().getTown()))
+                .setFont(fontNormal));
+        document.add(new Paragraph("Teléfono: " + safeText(user.getProfile().getNumberPhone()))
                 .setFont(fontNormal)
                 .setMarginBottom(15));
     }
@@ -201,13 +255,13 @@ public class GeneradorDeclaracionRentaService {
         try {
             return NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(value);
         } catch (Exception e) {
-            log.warn("Error formateando moneda, usando formato alternativo", e);
+            logger.warn("Error formateando moneda, usando formato alternativo", e);
             return String.format("$ %,.2f", value);
         }
     }
 
     private String safeText(String texto) {
-        return texto != null ? texto : "N/A";
+        return texto != null ? texto : "No proporcionado";
     }
 
     private List<Income> validarIngresos(List<Income> ingresos) {

@@ -18,19 +18,18 @@ public class RegisterRequest {
     private String name;
     private String lastName;
     private String surnamen;
-    private Integer typeDocument;
+    private TypeDocument typeDocument;
     private String document;
     private String profilePicture;
     private String birthDate;
     private String department;
     private String town;
     private String address;
-    private Integer civilStatus;
+    private CivilStatus civilStatus;
     private String numberPhone;
     private String email;
     private String occupation;
     private Boolean dataTreatment;
     private int exogenous;
     private String confirmCode;
-
 }

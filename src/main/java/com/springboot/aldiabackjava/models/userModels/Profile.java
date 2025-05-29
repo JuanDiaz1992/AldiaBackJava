@@ -21,6 +21,7 @@ public class Profile {
     @Column(name="surname",nullable = true)
     private String surnamen;
     @Column(name="type_document")
+    @Enumerated(EnumType.STRING)
     private TypeDocument typeDocument;
     private String document;
     @Column(name="profile_picture")
@@ -30,6 +31,7 @@ public class Profile {
     private String department;
     private String town;
     private String address;
+    @Enumerated(EnumType.STRING)
     private CivilStatus civilStatus;
     @Column(name="number_phone")
     private String numberPhone;
